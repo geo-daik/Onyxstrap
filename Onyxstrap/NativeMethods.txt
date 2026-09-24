@@ -1,5 +1,7 @@
-﻿SetForegroundWindow
+SetForegroundWindow
 FlashWindow
 GetWindowLong
 SetWindowLong
 SHObjectProperties
+SendMessage
+WM_SETICON

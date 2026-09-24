@@ -1,3 +1,6 @@
+using Windows.Win32;
+using Windows.Win32.Foundation;
+
 using Onyxstrap.AppData;
 using Onyxstrap.Integrations;
 using Onyxstrap.Models;
@@ -106,6 +109,9 @@ namespace Onyxstrap
             if (!_lock.IsAcquired || _watcherData is null)
                 return;
 
+            if (App.Settings.Prop.RebrandGameWindow)
+                Task.Run(RebrandGameWindowIcons);
+
             ActivityWatcher?.Start();
 
             while (Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
@@ -119,6 +125,66 @@ namespace Onyxstrap
 
             if (App.LaunchSettings.TestModeFlag.Active)
                 Process.Start(Paths.Process, "-settings -testmode");
+        }
+
+        // kept referenced so the handle stays valid while game windows use it
+        private System.Drawing.Icon? _rebrandIcon;
+
+        /// <summary>
+        /// Swaps the icon of any Roblox player window that appears during the
+        /// session to the Onyxstrap one via WM_SETICON. Purely cosmetic window
+        /// messaging - no client files are modified and nothing is injected.
+        /// Runs for the whole session so multi-instance launches get covered too.
+        /// </summary>
+        private void RebrandGameWindowIcons()
+        {
+            const string LOG_IDENT = "Watcher::RebrandGameWindowIcons";
+
+            try
+            {
+                _rebrandIcon = App.Settings.Prop.BootstrapperIcon.GetIcon();
+                nint hIcon = _rebrandIcon.Handle;
+
+                var rebranded = new HashSet<int>();
+
+                while (true)
+                {
+                    var gameProcesses = Utilities.GetProcessesSafe()
+                        .Where(x => x.ProcessName == "RobloxPlayerBeta")
+                        .ToList();
+
+                    foreach (var process in gameProcesses)
+                    {
+                        if (rebranded.Contains(process.Id))
+                            continue;
+
+                        try
+                        {
+                            if (process.MainWindowHandle == IntPtr.Zero)
+                                continue;
+
+                            PInvoke.SendMessage((HWND)process.MainWindowHandle, PInvoke.WM_SETICON, (WPARAM)(nuint)0, (LPARAM)(nint)hIcon); // ICON_SMALL
+                            PInvoke.SendMessage((HWND)process.MainWindowHandle, PInvoke.WM_SETICON, (WPARAM)(nuint)1, (LPARAM)(nint)hIcon); // ICON_BIG
+
+                            rebranded.Add(process.Id);
+                            App.Logger.WriteLine(LOG_IDENT, $"Rebranded the game window icon (pid={process.Id})");
+                        }
+                        catch (Exception)
+                        {
+                            // the process may have exited between listing and reading
+                        }
+                    }
+
+                    if (gameProcesses.Count == 0 && !Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
+                        return;
+
+                    Thread.Sleep(500);
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Failed to rebrand the game window icon: {ex.Message}");
+            }
         }
 
         public void Dispose()

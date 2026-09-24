@@ -5,7 +5,7 @@ namespace Onyxstrap.Models.Persistable
     public class Settings
     {
         // onyxstrap configuration
-        public BootstrapperStyle BootstrapperStyle { get; set; } = BootstrapperStyle.FluentDialog;
+        public BootstrapperStyle BootstrapperStyle { get; set; } = BootstrapperStyle.OnyxDialog;
         public BootstrapperIcon BootstrapperIcon { get; set; } = BootstrapperIcon.IconOnyxstrap;
         public string BootstrapperTitle { get; set; } = App.ProjectName;
         public string BootstrapperIconCustomLocation { get; set; } = "";
@@ -18,6 +18,7 @@ namespace Onyxstrap.Models.Persistable
         public bool UseFastFlagManager { get; set; } = true;
         public bool WPFSoftwareRender { get; set; } = false;
         public bool EnableAnalytics { get; set; } = false;
+        public bool RebrandGameWindow { get; set; } = true;
         public bool BackgroundUpdatesEnabled { get; set; } = false;
         public bool DebugDisableVersionPackageCleanup { get; set; } = false;
         public string? SelectedCustomTheme { get; set; } = null;

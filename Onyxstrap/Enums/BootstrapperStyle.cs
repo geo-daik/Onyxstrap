@@ -11,6 +11,7 @@ namespace Onyxstrap.Enums
         [EnumName(StaticName = "Onyxstrap")]
         FluentDialog,
         FluentAeroDialog,
-        CustomDialog
+        CustomDialog,
+        OnyxDialog
     }
 }

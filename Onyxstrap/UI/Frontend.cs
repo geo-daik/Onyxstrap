@@ -91,6 +91,7 @@ namespace Onyxstrap.UI
                 BootstrapperStyle.FluentDialog => new FluentDialog(false),
                 BootstrapperStyle.FluentAeroDialog => new FluentDialog(true),
                 BootstrapperStyle.CustomDialog => GetCustomBootstrapper(),
+                BootstrapperStyle.OnyxDialog => new OnyxDialog(),
                 _ => new FluentDialog(false)
             };
         }
