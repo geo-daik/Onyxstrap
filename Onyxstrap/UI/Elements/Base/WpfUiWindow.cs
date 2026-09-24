@@ -20,8 +20,13 @@ namespace Onyxstrap.UI.Elements.Base
         {
             const int customThemeIndex = 2; // index for CustomTheme merged dictionary
 
-            _themeService.SetTheme(App.Settings.Prop.Theme.GetFinal() == Enums.Theme.Dark ? ThemeType.Dark : ThemeType.Light);
-            _themeService.SetSystemAccent();
+            var themeType = App.Settings.Prop.Theme.GetFinal() == Enums.Theme.Dark ? ThemeType.Dark : ThemeType.Light;
+
+            _themeService.SetTheme(themeType);
+
+            // Onyx violet accent - the app keeps its own identity instead of
+            // following the Windows system accent color
+            Accent.Apply(System.Windows.Media.Color.FromRgb(0x7C, 0x6F, 0xD8), themeType, false);
 
             // there doesn't seem to be a way to query the name for merged dictionaries
             var dict = new ResourceDictionary { Source = new Uri($"pack://application:,,,/UI/Style/{Enum.GetName(App.Settings.Prop.Theme.GetFinal())}.xaml") };
