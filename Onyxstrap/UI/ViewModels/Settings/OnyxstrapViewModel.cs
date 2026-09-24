@@ -22,6 +22,12 @@ namespace Onyxstrap.UI.ViewModels.Settings
             set => App.Settings.Prop.EnableAnalytics = value;
         }
 
+        public bool GameIconRebrandEnabled
+        {
+            get => App.Settings.Prop.RebrandGameWindow;
+            set => App.Settings.Prop.RebrandGameWindow = value;
+        }
+
         public WebEnvironment WebEnvironment
         {
             get => App.Settings.Prop.WebEnvironment;

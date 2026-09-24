@@ -1449,4 +1449,10 @@ Defaulting to {1}.</value>
   <data name="Dialog.RemoveAccount.Confirm" xml:space="preserve">
     <value>Are you sure you want to remove {0} from Onyxstrap? This does not sign you out anywhere.</value>
   </data>
+  <data name="Menu.Onyxstrap.GameIconRebrand.Title" xml:space="preserve">
+    <value>Rebrand the game window icon</value>
+  </data>
+  <data name="Menu.Onyxstrap.GameIconRebrand.Description" xml:space="preserve">
+    <value>Swap the icon of the Roblox window and taskbar to the Onyxstrap one while playing, via window messages. No client files are modified and nothing is injected.</value>
+  </data>
 </root>

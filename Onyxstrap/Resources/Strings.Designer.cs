@@ -3799,5 +3799,23 @@ namespace Onyxstrap.Resources {
                 return ResourceManager.GetString("Dialog.RemoveAccount.Confirm", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rebrand the game window icon.
+        /// </summary>
+        public static string Menu_Onyxstrap_GameIconRebrand_Title {
+            get {
+                return ResourceManager.GetString("Menu.Onyxstrap.GameIconRebrand.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Swap the icon of the Roblox window and taskbar to the Onyxstrap one while playing, via window messages. No client files are modified and nothing is injected..
+        /// </summary>
+        public static string Menu_Onyxstrap_GameIconRebrand_Description {
+            get {
+                return ResourceManager.GetString("Menu.Onyxstrap.GameIconRebrand.Description", resourceCulture);
+            }
+        }
     }
 }

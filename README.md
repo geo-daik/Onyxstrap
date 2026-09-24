@@ -28,6 +28,17 @@ Accounts are saved by their `.ROBLOSECURITY` session token rather than your pass
 
 > Switching inside a *running* Roblox session would require injecting into the client, which Roblox's anti-cheat detects. Onyxstrap switches between sessions instead - pick an account, and the next launch boots into it.
 
+## Documentation
+
+Help lives in the [wiki](wiki/Home):
+
+- [Installing Onyxstrap](wiki/Installing-Onyxstrap.md)
+- [Account Manager](wiki/Account-Manager.md) — saving accounts, switching, token security
+- [Engine Settings (FastFlags)](wiki/Engine-Settings-FastFlags.md) — per-account flag sets and presets
+- [Mods & Customization](wiki/Mods-and-Customization.md) — bootstrapper styles, the game-window rebrand
+- [Troubleshooting](wiki/Troubleshooting.md)
+- [Security & Privacy](wiki/Security-and-Privacy.md)
+
 ## Building from source
 
 Requires the .NET SDK (8.0+ works; the project targets `net6.0-windows`):
