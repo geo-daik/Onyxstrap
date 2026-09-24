@@ -32,7 +32,7 @@ The `.ROBLOSECURITY` cookie was copied incompletely or the session is gone. Log 
 
 **Account stopped launching into the right session**
 
-Tokens can be invalidated (logout-everywhere, long inactivity, some IP changes). Remove the account and add it again with a fresh token.
+Tokens can be invalidated (logout-everywhere, long inactivity, some IP changes). Use the **Update token** button on the account card (circular arrow) to paste a fresh token without removing the account.
 
 ## FastFlags / mods not applying
 

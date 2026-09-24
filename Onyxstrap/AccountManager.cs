@@ -72,6 +72,19 @@ namespace Onyxstrap
             Save();
         }
 
+        /// <summary>
+        /// Re-authenticates an existing account with a fresh session token.
+        /// </summary>
+        public void UpdateAccountToken(string id, string securityToken)
+        {
+            var account = GetAccount(id);
+            if (account is null)
+                return;
+
+            account.ProtectedToken = ProtectToken(securityToken);
+            Save();
+        }
+
         public void RemoveAccount(string id)
         {
             var account = GetAccount(id);

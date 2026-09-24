@@ -135,6 +135,7 @@
                                 </ui:Button>
                                 <ui:Button Margin="4,0,0,0" Appearance="Primary" Icon="Play24" Content="{x:Static resources:Strings.Accounts_Launch}" Command="{Binding LaunchCommand}" />
                                 <ui:Button Margin="4,0,0,0" Icon="Edit16" Command="{Binding RenameCommand}" ToolTip="{x:Static resources:Strings.Accounts_Rename}" />
+                                <ui:Button Margin="4,0,0,0" Icon="ArrowClockwise16" Command="{Binding UpdateTokenCommand}" ToolTip="Update token" />
                                 <ui:Button Margin="4,0,0,0" Appearance="Danger" Icon="Delete16" Command="{Binding RemoveCommand}" ToolTip="{x:Static resources:Strings.Accounts_Remove}" />
                             </StackPanel>
                         </Grid>

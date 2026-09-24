@@ -188,6 +188,36 @@
                             <TextBlock Margin="0,2,0,0" FontSize="12" Text="{x:Static resources:Strings.LaunchMenu_Wiki_Description}" Padding="0,0,16,0" Foreground="#77E8E6F2" />
                         </StackPanel>
                     </ui:CardAction>
+
+                    <StackPanel x:Name="AccountsSection" Margin="0,14,0,0" Visibility="Collapsed">
+                        <TextBlock Text="L A U N C H   A S" FontFamily="{StaticResource Rubik}" FontSize="11" FontWeight="SemiBold" Foreground="#99B9AFFF" Margin="0,0,0,6" />
+                        <ItemsControl x:Name="AccountsList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ui:CardAction Margin="0,0,0,6" Click="AccountLaunch_Click" Tag="{Binding Id}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Width="26" Height="26" Source="{Binding Avatar}" RenderOptions.BitmapScalingMode="HighQuality" />
+                                            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" FontSize="13" Text="{Binding Name}" />
+                                            <Border Margin="8,0,0,0" Padding="7,1" CornerRadius="9" VerticalAlignment="Center"
+                                                    Background="{DynamicResource SystemAccentColorPrimaryBrush}">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock FontSize="10" FontWeight="SemiBold" Foreground="White" Text="ACTIVE" />
+                                            </Border>
+                                        </StackPanel>
+                                    </ui:CardAction>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Grid>

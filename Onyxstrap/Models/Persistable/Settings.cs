@@ -12,7 +12,7 @@ namespace Onyxstrap.Models.Persistable
         public Theme Theme { get; set; } = Theme.Dark;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool DeveloperMode { get; set; } = false;
-        public bool CheckForUpdates { get; set; } = true;
+        public bool CheckForUpdates { get; set; } = false;
         public bool ConfirmLaunches { get; set; } = false;
         public string Locale { get; set; } = "nil";
         public bool UseFastFlagManager { get; set; } = true;

@@ -15,6 +15,26 @@
     <StackPanel Margin="0,0,14,14">
         <TextBlock Margin="0,0,0,16" Text="{x:Static resources:Strings.Menu_FastFlags_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
+        <Border Margin="0,0,0,16" Padding="12,8" CornerRadius="8"
+                Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasAccounts}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Orientation="Horizontal">
+                <ui:SymbolIcon Symbol="Person24" Foreground="{DynamicResource SystemAccentColorPrimaryBrush}" />
+                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" FontSize="13">
+                    <Run Text="Editing flags for " /><Run Text="{Binding ActiveAccountName, Mode=OneWay}" FontWeight="SemiBold" /><Run Text=" - switch accounts on the Accounts page to edit theirs." />
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
         <controls:OptionControl
             Header="Onyx quick presets"
             Description="One-click flag bundles, applied to the active account's flag set. These set/remove only the flags listed on each button - everything else is left alone. Committed together with your other changes via Save.">

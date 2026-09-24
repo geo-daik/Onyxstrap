@@ -19,6 +19,8 @@ The installer itself is Onyxstrap-branded too: an onyx hero strip up top, violet
 
 Launching `Onyxstrap.exe` directly (for example from the Start Menu shortcut) opens the launch menu, where you can start Roblox or Studio without going through the website, and open settings.
 
+If you have saved accounts, the launch menu also lists them under **L A U N C H   A S** — one click starts a session as that account.
+
 ## Updating
 
 Onyxstrap keeps Roblox itself up to date automatically every launch. To update Onyxstrap itself, download the newer `Onyxstrap.exe` and run it — it will offer to upgrade the installed copy.

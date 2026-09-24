@@ -30,10 +30,11 @@ namespace Onyxstrap.UI.ViewModels.Settings
             public ICommand LaunchCommand => new RelayCommand(() => ViewModel.LaunchAccount(Id));
             public ICommand RenameCommand => new RelayCommand(() => ViewModel.RenameAccount(Id));
             public ICommand RemoveCommand => new RelayCommand(() => ViewModel.RemoveAccount(Id));
+            public ICommand UpdateTokenCommand => new RelayCommand(() => ViewModel.UpdateToken(Id));
         }
 
         // frozen avatar images keyed by account id, shared across page reloads
-        private static readonly Dictionary<string, ImageSource> AvatarCache = new();
+        public static readonly Dictionary<string, ImageSource> AvatarCache = new();
 
         private static readonly HashSet<long> AvatarFetchFailed = new();
 
@@ -204,6 +205,14 @@ namespace Onyxstrap.UI.ViewModels.Settings
                 return;
 
             App.Accounts.RenameAccount(id, dialog.TextInput);
+            Refresh();
+        }
+
+        private void UpdateToken(string id)
+        {
+            var dialog = new AddAccountDialog(id);
+            dialog.ShowDialog();
+
             Refresh();
         }
 

@@ -17,8 +17,13 @@ namespace Onyxstrap.UI.Elements.Dialogs
 
         public string SecurityToken => AccountTokenTextBox.Password.Trim();
 
-        public AddAccountDialog()
+        private readonly string? _existingAccountId;
+
+        /// <param name="existingAccountId">When set, the dialog re-authenticates that account instead of adding a new one.</param>
+        public AddAccountDialog(string? existingAccountId = null)
         {
+            _existingAccountId = existingAccountId;
+
             InitializeComponent();
 
             AccountNameTextBox.TextChanged += (_, _) => UpdateOKState();
@@ -47,14 +52,21 @@ namespace Onyxstrap.UI.Elements.Dialogs
                 return;
             }
 
-            // auto-fill the display name if the user left it empty
-            if (String.IsNullOrWhiteSpace(AccountName))
-                AccountNameTextBox.Text = validation.Value.Username ?? "";
+            if (_existingAccountId is not null)
+            {
+                App.Accounts.UpdateAccountToken(_existingAccountId, SecurityToken);
+            }
+            else
+            {
+                // auto-fill the display name if the user left it empty
+                if (String.IsNullOrWhiteSpace(AccountName))
+                    AccountNameTextBox.Text = validation.Value.Username ?? "";
 
-            // grab the avatar headshot while we're at it
-            string? avatarUrl = await RobloxAuth.GetAvatarUrl(validation.Value.UserId);
+                // grab the avatar headshot while we're at it
+                string? avatarUrl = await RobloxAuth.GetAvatarUrl(validation.Value.UserId);
 
-            App.Accounts.AddAccount(AccountNameTextBox.Text.Trim(), SecurityToken, validation.Value.UserId, avatarUrl);
+                App.Accounts.AddAccount(AccountNameTextBox.Text.Trim(), SecurityToken, validation.Value.UserId, avatarUrl);
+            }
 
             Result = MessageBoxResult.OK;
             Close();

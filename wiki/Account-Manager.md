@@ -32,6 +32,7 @@ Switching takes effect on the next Roblox launch: Onyxstrap mints a one-time **a
 
 - **Rename** — change the display name (this is local only; it doesn't affect your Roblox username).
 - **Remove** — forgets the account locally. It does *not* sign that account out anywhere.
+- **Update token** (circular-arrow button) — if a session token expired, paste a fresh one and the account is re-authenticated in place; no need to remove and re-add it.
 - If a token stops working (you logged out everywhere, Roblox invalidated the session, or you changed IP in some cases), remove the account and add it again with a fresh token.
 
 ## How your tokens are stored
