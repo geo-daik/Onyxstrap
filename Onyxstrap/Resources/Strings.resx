@@ -1386,4 +1386,67 @@ Defaulting to {1}.</value>
   <data name="Menu.FastFlagEditor.AllowlistInformation" xml:space="preserve">
     <value>Due to the [Fast Flag allowlist update]({0}), most custom Fast Flags will have no effect on the Roblox player.</value>
   </data>
+  <data name="Menu.Accounts.Title" xml:space="preserve">
+    <value>Accounts</value>
+  </data>
+  <data name="Accounts.Description" xml:space="preserve">
+    <value>Save your Roblox accounts and switch between them. Each account keeps its own FastFlag set, and presets can be applied to any account. Switching takes effect the next time Roblox is launched.</value>
+  </data>
+  <data name="Accounts.AddAccount" xml:space="preserve">
+    <value>Add account</value>
+  </data>
+  <data name="Accounts.SetActive" xml:space="preserve">
+    <value>Set as active</value>
+  </data>
+  <data name="Accounts.Launch" xml:space="preserve">
+    <value>Launch</value>
+  </data>
+  <data name="Accounts.Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Accounts.Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Accounts.ActiveBadge" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Accounts.NoAccounts" xml:space="preserve">
+    <value>No accounts saved yet. Click "Add account" to save your first one.</value>
+  </data>
+  <data name="Dialog.AddAccount.Title" xml:space="preserve">
+    <value>Add account</value>
+  </data>
+  <data name="Dialog.AddAccount.NameLabel" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="Dialog.AddAccount.TokenLabel" xml:space="preserve">
+    <value>Paste your .ROBLOSECURITY session token. Onyxstrap only sends it to roblox.com to verify it, and stores it encrypted on this PC. Anyone with this token can access your account - never share it.</value>
+  </data>
+  <data name="Dialog.AddAccount.OK" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Dialog.AddAccount.InvalidToken" xml:space="preserve">
+    <value>That token is not valid or has expired. Log into roblox.com in your browser, then copy the .ROBLOSECURITY cookie from the site's cookies and paste it here.</value>
+  </data>
+  <data name="Accounts.PresetsTitle" xml:space="preserve">
+    <value>Presets</value>
+  </data>
+  <data name="Accounts.SavePreset" xml:space="preserve">
+    <value>Save current flags as preset</value>
+  </data>
+  <data name="Dialog.SavePreset.NameLabel" xml:space="preserve">
+    <value>Preset name</value>
+  </data>
+  <data name="Accounts.ApplyPreset" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Dialog.SavePreset.ConfirmOverwrite" xml:space="preserve">
+    <value>A preset named {0} already exists. Overwrite it?</value>
+  </data>
+  <data name="Dialog.RemoveAccount.Title" xml:space="preserve">
+    <value>Remove account</value>
+  </data>
+  <data name="Dialog.RemoveAccount.Confirm" xml:space="preserve">
+    <value>Are you sure you want to remove {0} from Onyxstrap? This does not sign you out anywhere.</value>
+  </data>
 </root>

@@ -304,7 +304,7 @@ namespace Onyxstrap
                         Frontend.ShowBalloonTip(Strings.Bootstrapper_ModificationsFailed_Title, Strings.Bootstrapper_ModificationsFailed_Message, ToolTipIcon.Warning);
                 }
 
-                StartRoblox();
+                await StartRoblox();
             }
 
             await mutex.ReleaseAsync();
@@ -554,11 +554,24 @@ namespace Onyxstrap
             }
         }
 
-        private void StartRoblox()
+        private async Task StartRoblox()
         {
             const string LOG_IDENT = "Bootstrapper::StartRoblox";
 
             SetStatus(Strings.Bootstrapper_Status_Starting);
+
+            // account switcher: with an active account, mint a one-time
+            // authentication ticket and rebuild the launch URI so the client
+            // boots logged in as that account
+            if (_launchMode == LaunchMode.Player && App.Accounts.ActiveAccount is OnyxAccount account)
+            {
+                string? token = App.Accounts.GetToken(account);
+
+                if (!String.IsNullOrEmpty(token))
+                    _launchCommandLine = await RobloxAuth.BuildAccountLaunchArgs(_launchCommandLine, token);
+                else
+                    App.Logger.WriteLine(LOG_IDENT, "Active account has no usable token, launching without account switch");
+            }
 
             var startInfo = new ProcessStartInfo()
             {

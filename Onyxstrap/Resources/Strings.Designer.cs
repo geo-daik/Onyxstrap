@@ -3610,5 +3610,194 @@ namespace Onyxstrap.Resources {
                 return ResourceManager.GetString("Uninstaller.Uninstall", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Accounts.
+        /// </summary>
+        public static string Menu_Accounts_Title {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Save your Roblox accounts and switch between them. Each account keeps its own FastFlag set, and presets can be applied to any account. Switching takes effect the next time Roblox is launched..
+        /// </summary>
+        public static string Accounts_Description {
+            get {
+                return ResourceManager.GetString("Accounts.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add account.
+        /// </summary>
+        public static string Accounts_AddAccount {
+            get {
+                return ResourceManager.GetString("Accounts.AddAccount", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Set as active.
+        /// </summary>
+        public static string Accounts_SetActive {
+            get {
+                return ResourceManager.GetString("Accounts.SetActive", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch.
+        /// </summary>
+        public static string Accounts_Launch {
+            get {
+                return ResourceManager.GetString("Accounts.Launch", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        public static string Accounts_Rename {
+            get {
+                return ResourceManager.GetString("Accounts.Rename", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        public static string Accounts_Remove {
+            get {
+                return ResourceManager.GetString("Accounts.Remove", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Active.
+        /// </summary>
+        public static string Accounts_ActiveBadge {
+            get {
+                return ResourceManager.GetString("Accounts.ActiveBadge", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No accounts saved yet. Click &quot;Add account&quot; to save your first one..
+        /// </summary>
+        public static string Accounts_NoAccounts {
+            get {
+                return ResourceManager.GetString("Accounts.NoAccounts", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add account.
+        /// </summary>
+        public static string Dialog_AddAccount_Title {
+            get {
+                return ResourceManager.GetString("Dialog.AddAccount.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Display name.
+        /// </summary>
+        public static string Dialog_AddAccount_NameLabel {
+            get {
+                return ResourceManager.GetString("Dialog.AddAccount.NameLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Paste your .ROBLOSECURITY session token. Onyxstrap only sends it to roblox.com to verify it, and stores it encrypted on this PC. Anyone with this token can access your account - never share it..
+        /// </summary>
+        public static string Dialog_AddAccount_TokenLabel {
+            get {
+                return ResourceManager.GetString("Dialog.AddAccount.TokenLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        public static string Dialog_AddAccount_OK {
+            get {
+                return ResourceManager.GetString("Dialog.AddAccount.OK", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to That token is not valid or has expired. Log into roblox.com in your browser, then copy the .ROBLOSECURITY cookie from the site's cookies and paste it here..
+        /// </summary>
+        public static string Dialog_AddAccount_InvalidToken {
+            get {
+                return ResourceManager.GetString("Dialog.AddAccount.InvalidToken", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Presets.
+        /// </summary>
+        public static string Accounts_PresetsTitle {
+            get {
+                return ResourceManager.GetString("Accounts.PresetsTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Save current flags as preset.
+        /// </summary>
+        public static string Accounts_SavePreset {
+            get {
+                return ResourceManager.GetString("Accounts.SavePreset", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preset name.
+        /// </summary>
+        public static string Dialog_SavePreset_NameLabel {
+            get {
+                return ResourceManager.GetString("Dialog.SavePreset.NameLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Apply.
+        /// </summary>
+        public static string Accounts_ApplyPreset {
+            get {
+                return ResourceManager.GetString("Accounts.ApplyPreset", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A preset named {0} already exists. Overwrite it?.
+        /// </summary>
+        public static string Dialog_SavePreset_ConfirmOverwrite {
+            get {
+                return ResourceManager.GetString("Dialog.SavePreset.ConfirmOverwrite", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove account.
+        /// </summary>
+        public static string Dialog_RemoveAccount_Title {
+            get {
+                return ResourceManager.GetString("Dialog.RemoveAccount.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to remove {0} from Onyxstrap? This does not sign you out anywhere..
+        /// </summary>
+        public static string Dialog_RemoveAccount_Confirm {
+            get {
+                return ResourceManager.GetString("Dialog.RemoveAccount.Confirm", resourceCulture);
+            }
+        }
     }
 }
