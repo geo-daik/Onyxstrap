@@ -19,7 +19,72 @@
         ExtendsContentIntoTitleBar="True"
         WindowStartupLocation="CenterScreen"
         Background="Transparent" AllowsTransparency="True">
-    <Border CornerRadius="16" BorderBrush="#268A80DC" BorderThickness="1">
+    <base:WpfUiWindow.Resources>
+        <QuadraticEase x:Key="SilkEase" EasingMode="EaseInOut" />
+
+        <!-- gem breathing loop -->
+        <Storyboard x:Key="GemLoop" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="GemBreathe" Storyboard.TargetProperty="ScaleX" From="1" To="1.05" Duration="0:0:1.8" EasingFunction="{StaticResource SilkEase}" />
+            <DoubleAnimation Storyboard.TargetName="GemBreathe" Storyboard.TargetProperty="ScaleY" From="1" To="1.05" Duration="0:0:1.8" EasingFunction="{StaticResource SilkEase}" />
+            <DoubleAnimation Storyboard.TargetName="GemGlow" Storyboard.TargetProperty="BlurRadius" From="22" To="40" Duration="0:0:1.8" EasingFunction="{StaticResource SilkEase}" />
+            <DoubleAnimation Storyboard.TargetName="GemGlow" Storyboard.TargetProperty="Opacity" From="0.4" To="0.75" Duration="0:0:1.8" EasingFunction="{StaticResource SilkEase}" />
+        </Storyboard>
+
+        <!-- slow diagonal light sweep across the panel -->
+        <Storyboard x:Key="SweepLoop" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SweepSlide" Storyboard.TargetProperty="X">
+                <DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="-300" />
+                <SplineDoubleKeyFrame KeyTime="0:0:2.6" Value="760" KeySpline="0.4,0 0.6,1" />
+                <DiscreteDoubleKeyFrame KeyTime="0:0:6" Value="760" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+
+        <!-- hover-slide for the action tiles -->
+        <Style BasedOn="{StaticResource {x:Type ui:CardAction}}" TargetType="ui:CardAction">
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform X="0" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="5" Duration="0:0:0.16" EasingFunction="{StaticResource SilkEase}" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.22" EasingFunction="{StaticResource SilkEase}" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </base:WpfUiWindow.Resources>
+
+    <base:WpfUiWindow.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource GemLoop}" />
+            <BeginStoryboard Storyboard="{StaticResource SweepLoop}" />
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="RootPanel" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.35" />
+                    <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleX" From="0.96" To="1" Duration="0:0:0.35" EasingFunction="{StaticResource SilkEase}" />
+                    <DoubleAnimation Storyboard.TargetName="RootScale" Storyboard.TargetProperty="ScaleY" From="0.96" To="1" Duration="0:0:0.35" EasingFunction="{StaticResource SilkEase}" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </base:WpfUiWindow.Triggers>
+
+    <Border x:Name="RootPanel" CornerRadius="16" BorderBrush="#268A80DC" BorderThickness="1" RenderTransformOrigin="0.5,0.5">
+        <Border.RenderTransform>
+            <ScaleTransform x:Name="RootScale" />
+        </Border.RenderTransform>
         <Border.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#FF1B1728" Offset="0" />
@@ -35,6 +100,20 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+
+            <!-- light sweep -->
+            <Rectangle Panel.ZIndex="1" IsHitTestVisible="False" Width="240" HorizontalAlignment="Left">
+                <Rectangle.RenderTransform>
+                    <TranslateTransform x:Name="SweepSlide" X="-300" />
+                </Rectangle.RenderTransform>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#00FFFFFF" Offset="0" />
+                        <GradientStop Color="#12FFFFFF" Offset="0.5" />
+                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
 
             <!-- ambient glow -->
             <Ellipse Grid.Row="0" Grid.RowSpan="2" Width="420" Height="420" Margin="-160,-180,0,0"
@@ -58,8 +137,11 @@
                 <!-- hero -->
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
                     <Image Width="92" Height="92" HorizontalAlignment="Left" Source="pack://application:,,,/Onyxstrap.ico" RenderOptions.BitmapScalingMode="HighQuality">
+                        <Image.RenderTransform>
+                            <ScaleTransform x:Name="GemBreathe" CenterX="46" CenterY="46" />
+                        </Image.RenderTransform>
                         <Image.Effect>
-                            <DropShadowEffect BlurRadius="30" ShadowDepth="0" Color="#8A80DC" Opacity="0.5" />
+                            <DropShadowEffect x:Name="GemGlow" BlurRadius="22" ShadowDepth="0" Color="#8A80DC" Opacity="0.4" />
                         </Image.Effect>
                     </Image>
                     <TextBlock Margin="0,14,0,0" Text="O N Y X S T R A P" FontFamily="{StaticResource Rubik}" FontSize="19" FontWeight="SemiBold">

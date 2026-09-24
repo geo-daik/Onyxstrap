@@ -12,7 +12,23 @@
       Title="AccountsPage"
       Scrollable="True"
       Loaded="Page_Loaded">
-    <StackPanel Margin="0,0,14,14">
+    <ui:UiPage.Resources>
+        <QuadraticEase x:Key="SilkEase" EasingMode="EaseInOut" />
+    </ui:UiPage.Resources>
+    <ui:UiPage.Triggers>
+        <EventTrigger RoutedEvent="Page.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="PageContent" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3" />
+                    <DoubleAnimation Storyboard.TargetName="PageSlide" Storyboard.TargetProperty="Y" From="14" To="0" Duration="0:0:0.35" EasingFunction="{StaticResource SilkEase}" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </ui:UiPage.Triggers>
+    <StackPanel x:Name="PageContent" Margin="0,0,14,14">
+        <StackPanel.RenderTransform>
+            <TranslateTransform x:Name="PageSlide" Y="0" />
+        </StackPanel.RenderTransform>
         <TextBlock Margin="0,0,0,16" Text="{x:Static resources:Strings.Accounts_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
 
         <ui:CardAction Icon="PersonAdd24" Command="{Binding AddAccountCommand, Mode=OneTime}">

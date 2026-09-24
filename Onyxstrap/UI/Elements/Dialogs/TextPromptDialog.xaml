@@ -16,7 +16,23 @@
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         ExtendsContentIntoTitleBar="True"
         WindowStartupLocation="CenterScreen">
-    <Grid>
+    <base:WpfUiWindow.Resources>
+        <QuadraticEase x:Key="SilkEase" EasingMode="EaseInOut" />
+    </base:WpfUiWindow.Resources>
+    <base:WpfUiWindow.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="EntranceHost" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25" />
+                    <DoubleAnimation Storyboard.TargetName="EntranceSlide" Storyboard.TargetProperty="Y" From="14" To="0" Duration="0:0:0.3" EasingFunction="{StaticResource SilkEase}" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </base:WpfUiWindow.Triggers>
+    <Grid x:Name="EntranceHost">
+        <Grid.RenderTransform>
+            <TranslateTransform x:Name="EntranceSlide" Y="0" />
+        </Grid.RenderTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

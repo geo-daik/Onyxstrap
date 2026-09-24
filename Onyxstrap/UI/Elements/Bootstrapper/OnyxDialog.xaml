@@ -19,6 +19,7 @@
 
     <Window.Resources>
         <QuadraticEase x:Key="SilkEase" EasingMode="EaseInOut" />
+        <BackEase x:Key="PopEase" EasingMode="EaseOut" Amplitude="0.55" />
 
         <!-- gem breathing loop -->
         <Storyboard x:Key="GemLoop" RepeatBehavior="Forever" AutoReverse="True">
@@ -27,15 +28,34 @@
             <DoubleAnimation Storyboard.TargetName="GemGlow" Storyboard.TargetProperty="BlurRadius" From="24" To="44" Duration="0:0:1.6" EasingFunction="{StaticResource SilkEase}" />
             <DoubleAnimation Storyboard.TargetName="GemGlow" Storyboard.TargetProperty="Opacity" From="0.55" To="0.95" Duration="0:0:1.6" EasingFunction="{StaticResource SilkEase}" />
         </Storyboard>
+
+        <!-- rotating halo ring -->
+        <Storyboard x:Key="HaloLoop" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="HaloRotate" Storyboard.TargetProperty="Angle" From="0" To="360" Duration="0:0:14" />
+        </Storyboard>
+
+        <!-- progress track shimmer -->
+        <Storyboard x:Key="ShimmerLoop" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ShimmerSlide" Storyboard.TargetProperty="X">
+                <DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="-60" />
+                <EasingDoubleKeyFrame KeyTime="0:0:1.4" Value="500" EasingFunction="{StaticResource SilkEase}" />
+                <DiscreteDoubleKeyFrame KeyTime="0:0:2.2" Value="500" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
     </Window.Resources>
 
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
             <BeginStoryboard Storyboard="{StaticResource GemLoop}" />
+            <BeginStoryboard Storyboard="{StaticResource HaloLoop}" />
+            <BeginStoryboard Storyboard="{StaticResource ShimmerLoop}" />
             <BeginStoryboard>
                 <Storyboard>
                     <DoubleAnimation Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.5" />
                     <DoubleAnimation Storyboard.TargetName="Gem" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.9" />
+                    <DoubleAnimation Storyboard.TargetName="GemPop" Storyboard.TargetProperty="ScaleX" From="0.6" To="1" Duration="0:0:0.8" EasingFunction="{StaticResource PopEase}" />
+                    <DoubleAnimation Storyboard.TargetName="GemPop" Storyboard.TargetProperty="ScaleY" From="0.6" To="1" Duration="0:0:0.8" EasingFunction="{StaticResource PopEase}" />
+                    <DoubleAnimation Storyboard.TargetName="Halo" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1.1" BeginTime="0:0:0.3" />
                     <DoubleAnimation Storyboard.TargetName="Wordmark" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.7" BeginTime="0:0:0.35" />
                     <DoubleAnimation Storyboard.TargetName="Tagline" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.7" BeginTime="0:0:0.55" />
                 </Storyboard>
@@ -94,16 +114,29 @@
                 </Button>
 
                 <!-- centerpiece -->
-                <StackPanel VerticalAlignment="Center" Margin="0,0,0,60">
-                    <Image x:Name="Gem" Width="104" Height="104" HorizontalAlignment="Center"
-                           Source="pack://application:,,,/Onyxstrap.ico" RenderOptions.BitmapScalingMode="HighQuality">
-                        <Image.RenderTransform>
-                            <ScaleTransform x:Name="GemScale" CenterX="52" CenterY="52" />
-                        </Image.RenderTransform>
-                        <Image.Effect>
-                            <DropShadowEffect x:Name="GemGlow" BlurRadius="24" ShadowDepth="0" Color="#8A80DC" Opacity="0.55" />
-                        </Image.Effect>
-                    </Image>
+                <StackPanel VerticalAlignment="Center" Margin="0,0,0,48">
+                    <Grid Width="150" Height="150" HorizontalAlignment="Center">
+                        <Grid.RenderTransform>
+                            <ScaleTransform x:Name="GemPop" CenterX="75" CenterY="75" />
+                        </Grid.RenderTransform>
+
+                        <Ellipse x:Name="Halo" Width="142" Height="142" Stroke="#4D8A80DC" StrokeThickness="2"
+                                 StrokeDashArray="3 7" StrokeDashCap="Round" Opacity="0" RenderTransformOrigin="0.5,0.5">
+                            <Ellipse.RenderTransform>
+                                <RotateTransform x:Name="HaloRotate" Angle="0" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+
+                        <Image x:Name="Gem" Width="104" Height="104" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Source="pack://application:,,,/Onyxstrap.ico" RenderOptions.BitmapScalingMode="HighQuality">
+                            <Image.RenderTransform>
+                                <ScaleTransform x:Name="GemScale" CenterX="52" CenterY="52" />
+                            </Image.RenderTransform>
+                            <Image.Effect>
+                                <DropShadowEffect x:Name="GemGlow" BlurRadius="24" ShadowDepth="0" Color="#8A80DC" Opacity="0.55" />
+                            </Image.Effect>
+                        </Image>
+                    </Grid>
 
                     <TextBlock x:Name="Wordmark" HorizontalAlignment="Center" Margin="0,18,0,0" Opacity="0"
                                Text="O N Y X S T R A P" FontFamily="{StaticResource Rubik}" FontSize="24" FontWeight="SemiBold">
@@ -130,18 +163,34 @@
                     <TextBlock Grid.Row="0" TextAlignment="Center" Text="{Binding Message}" FontFamily="{StaticResource Rubik}"
                                FontSize="15" FontWeight="Light" Foreground="#CCE8E6F2" Margin="0,0,0,18" />
 
-                    <ProgressBar Grid.Row="1" Height="6" BorderThickness="0"
-                                 Foreground="#FF8A80DC" Background="#14FFFFFF"
-                                 IsIndeterminate="{Binding ProgressIndeterminate}"
-                                 Maximum="{Binding ProgressMaximum, Mode=OneWay}" Value="{Binding ProgressValue}">
-                        <ProgressBar.Template>
-                            <ControlTemplate TargetType="ProgressBar">
-                                <Border x:Name="PART_Track" CornerRadius="3" Background="{TemplateBinding Background}">
-                                    <Border x:Name="PART_Indicator" CornerRadius="3" HorizontalAlignment="Left" Background="{TemplateBinding Foreground}" />
-                                </Border>
-                            </ControlTemplate>
-                        </ProgressBar.Template>
-                    </ProgressBar>
+                    <Grid Grid.Row="1" Height="6">
+                        <ProgressBar Height="6" BorderThickness="0"
+                                     Foreground="#FF8A80DC" Background="#14FFFFFF"
+                                     IsIndeterminate="{Binding ProgressIndeterminate}"
+                                     Maximum="{Binding ProgressMaximum, Mode=OneWay}" Value="{Binding ProgressValue}">
+                            <ProgressBar.Template>
+                                <ControlTemplate TargetType="ProgressBar">
+                                    <Border x:Name="PART_Track" CornerRadius="3" Background="{TemplateBinding Background}">
+                                        <Border x:Name="PART_Indicator" CornerRadius="3" HorizontalAlignment="Left" Background="{TemplateBinding Foreground}" />
+                                    </Border>
+                                </ControlTemplate>
+                            </ProgressBar.Template>
+                        </ProgressBar>
+                        <Grid ClipToBounds="True">
+                            <Rectangle Width="54" RadiusX="3" RadiusY="3" Opacity="0.35" HorizontalAlignment="Left">
+                                <Rectangle.RenderTransform>
+                                    <TranslateTransform x:Name="ShimmerSlide" X="-60" />
+                                </Rectangle.RenderTransform>
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#00FFFFFF" Offset="0" />
+                                        <GradientStop Color="#FFFFFFFF" Offset="0.5" />
+                                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </Grid>
+                    </Grid>
                 </Grid>
 
                 <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="16"
