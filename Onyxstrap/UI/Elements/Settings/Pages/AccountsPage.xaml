@@ -38,18 +38,50 @@
         <ItemsControl ItemsSource="{Binding AccountEntries, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ui:Card Margin="0,0,0,8">
+                    <ui:Card Margin="0,0,0,8" Padding="14,12">
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <Border Grid.Column="0" Width="44" Height="44" CornerRadius="22"
+                                    Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}"
+                                    BorderBrush="{DynamicResource SystemAccentColorPrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Image Source="{Binding Avatar}" Width="42" Height="42" RenderOptions.BitmapScalingMode="HighQuality">
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasAvatar}" Value="False">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                    <ui:SymbolIcon Symbol="Person24" FontSize="22" Foreground="{DynamicResource TextFillColorTertiaryBrush}">
+                                        <ui:SymbolIcon.Style>
+                                            <Style TargetType="ui:SymbolIcon">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasAvatar}" Value="False">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:SymbolIcon.Style>
+                                    </ui:SymbolIcon>
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontSize="16" FontWeight="Medium" Text="{Binding Name}" />
-                                    <Border Margin="8,2,0,2" Padding="6,1" CornerRadius="4" VerticalAlignment="Center"
-                                            Background="#23714B1E" Visibility="Collapsed">
+                                    <TextBlock FontSize="16" FontWeight="Medium" Text="{Binding Name}" VerticalAlignment="Center" />
+                                    <Border Margin="8,0,0,0" Padding="8,2" CornerRadius="10" VerticalAlignment="Center"
+                                            Background="{DynamicResource SystemAccentColorPrimaryBrush}">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -60,17 +92,18 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
-                                        <TextBlock FontSize="11" FontWeight="SemiBold" Text="{x:Static resources:Strings.Accounts_ActiveBadge}" />
+                                        <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="White" Text="{x:Static resources:Strings.Accounts_ActiveBadge}" />
                                     </Border>
                                 </StackPanel>
                                 <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}">
-                                    <Run Text="{Binding UserId, Mode=OneWay}" />
+                                    <Run Text="@" /><Run Text="{Binding UserId, Mode=OneWay}" />
                                 </TextBlock>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                 <ui:Button Margin="4,0,0,0" Appearance="Primary" Icon="PersonAvailable24" Content="{x:Static resources:Strings.Accounts_SetActive}"
-                                           Command="{Binding SetActiveCommand}">
+                                           Command="{Binding SetActiveCommand}"
+                                           ToolTip="{x:Static resources:Strings.Accounts_SetActive}">
                                     <ui:Button.Style>
                                         <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
                                             <Style.Triggers>
@@ -81,9 +114,9 @@
                                         </Style>
                                     </ui:Button.Style>
                                 </ui:Button>
-                                <ui:Button Margin="4,0,0,0" Icon="Play24" Content="{x:Static resources:Strings.Accounts_Launch}" Command="{Binding LaunchCommand}" />
-                                <ui:Button Margin="4,0,0,0" Icon="Edit16" Content="{x:Static resources:Strings.Accounts_Rename}" Command="{Binding RenameCommand}" />
-                                <ui:Button Margin="4,0,0,0" Appearance="Danger" Icon="Delete16" Content="{x:Static resources:Strings.Accounts_Remove}" Command="{Binding RemoveCommand}" />
+                                <ui:Button Margin="4,0,0,0" Appearance="Primary" Icon="Play24" Content="{x:Static resources:Strings.Accounts_Launch}" Command="{Binding LaunchCommand}" />
+                                <ui:Button Margin="4,0,0,0" Icon="Edit16" Command="{Binding RenameCommand}" ToolTip="{x:Static resources:Strings.Accounts_Rename}" />
+                                <ui:Button Margin="4,0,0,0" Appearance="Danger" Icon="Delete16" Command="{Binding RemoveCommand}" ToolTip="{x:Static resources:Strings.Accounts_Remove}" />
                             </StackPanel>
                         </Grid>
                     </ui:Card>

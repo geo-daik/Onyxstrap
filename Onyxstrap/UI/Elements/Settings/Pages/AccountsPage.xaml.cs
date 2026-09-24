@@ -22,6 +22,14 @@ namespace Onyxstrap.UI.Elements.Settings.Pages
             DataContext = _viewModel;
         }
 
+        /// <summary>
+        /// Rebuilds the view model, e.g. when background avatar fetches complete.
+        /// </summary>
+        public void ReloadViewModel()
+        {
+            SetupViewModel();
+        }
+
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // refresh the view model on page load to reflect any vault changes

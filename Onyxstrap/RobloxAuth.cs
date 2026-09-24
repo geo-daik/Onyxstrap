@@ -192,6 +192,31 @@ namespace Onyxstrap
             return true;
         }
 
+        /// <summary>
+        /// Fetches the headshot avatar URL for a user from Roblox's thumbnail API.
+        /// </summary>
+        public static async Task<string?> GetAvatarUrl(long userId)
+        {
+            const string LOG_IDENT = "RobloxAuth::GetAvatarUrl";
+
+            if (userId <= 0)
+                return null;
+
+            try
+            {
+                var response = await Http.GetJson<ThumbnailResponse>(
+                    $"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={userId}&size=150x150&format=Png&isCircular=false"
+                );
+
+                return response?.Data?.FirstOrDefault()?.ImageUrl;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Failed to fetch avatar for user {userId}: {ex.Message}");
+                return null;
+            }
+        }
+
         private class UserAuthenticated
         {
             [JsonPropertyName("id")]
@@ -199,6 +224,18 @@ namespace Onyxstrap
 
             [JsonPropertyName("name")]
             public string? Name { get; set; }
+        }
+
+        private class ThumbnailResponse
+        {
+            [JsonPropertyName("data")]
+            public List<ThumbnailItem>? Data { get; set; }
+        }
+
+        private class ThumbnailItem
+        {
+            [JsonPropertyName("imageUrl")]
+            public string? ImageUrl { get; set; }
         }
     }
 }

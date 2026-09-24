@@ -1,7 +1,10 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!-- Onyx theme surfaces (light): clean surfaces with a whisper of violet -->
     <Color x:Key="ApplicationBackgroundColor">#FFFBFAFD</Color>
-    <SolidColorBrush x:Key="ApplicationBackgroundBrush" Color="#FFFBFAFD" />
+    <LinearGradientBrush x:Key="ApplicationBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFCFBFE" Offset="0" />
+        <GradientStop Color="#FFF3F1F9" Offset="1" />
+    </LinearGradientBrush>
     <SolidColorBrush x:Key="SolidBackgroundFillColorBaseBrush" Color="#FFF6F5FA" />
     <SolidColorBrush x:Key="SolidBackgroundFillColorSecondaryBrush" Color="#FFF1F0F8" />
     <SolidColorBrush x:Key="SolidBackgroundFillColorTertiaryBrush" Color="#FFEDECF6" />

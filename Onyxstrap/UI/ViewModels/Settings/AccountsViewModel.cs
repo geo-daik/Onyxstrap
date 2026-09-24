@@ -1,6 +1,9 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,6 +20,9 @@ namespace Onyxstrap.UI.ViewModels.Settings
             public string Name { get; set; } = "";
             public long UserId { get; set; } = 0;
             public bool IsActive { get; set; } = false;
+            public ImageSource? Avatar { get; set; }
+
+            public bool HasAvatar => Avatar is not null;
 
             public AccountsViewModel ViewModel { get; init; } = null!;
 
@@ -25,6 +31,13 @@ namespace Onyxstrap.UI.ViewModels.Settings
             public ICommand RenameCommand => new RelayCommand(() => ViewModel.RenameAccount(Id));
             public ICommand RemoveCommand => new RelayCommand(() => ViewModel.RemoveAccount(Id));
         }
+
+        // frozen avatar images keyed by account id, shared across page reloads
+        private static readonly Dictionary<string, ImageSource> AvatarCache = new();
+
+        private static readonly HashSet<long> AvatarFetchFailed = new();
+
+        private static bool _isFetchingAvatars = false;
 
         private ObservableCollection<AccountEntry> _accountEntries = new();
 
@@ -70,6 +83,7 @@ namespace Onyxstrap.UI.ViewModels.Settings
                     Name = account.Name,
                     UserId = account.UserId,
                     IsActive = account.Id == App.Accounts.Prop.ActiveAccountId,
+                    Avatar = AvatarCache.TryGetValue(account.Id, out var avatar) ? avatar : null,
                     ViewModel = this
                 })
             );
@@ -79,6 +93,80 @@ namespace Onyxstrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(HasNoAccounts));
             OnPropertyChanged(nameof(HasPresets));
             OnPropertyChanged(nameof(ActiveAccountName));
+
+            FetchMissingAvatars();
+        }
+
+        /// <summary>
+        /// Downloads avatar headshots for accounts that don't have one cached yet,
+        /// in the background, then refreshes the page so they pop in.
+        /// </summary>
+        private static async void FetchMissingAvatars()
+        {
+            if (_isFetchingAvatars)
+                return;
+
+            var pending = App.Accounts.Accounts
+                .Where(account => account.UserId > 0 && !AvatarCache.ContainsKey(account.Id) && !AvatarFetchFailed.Contains(account.UserId))
+                .ToList();
+
+            if (pending.Count == 0)
+                return;
+
+            _isFetchingAvatars = true;
+
+            try
+            {
+                foreach (var account in pending)
+                {
+                    string? url = await RobloxAuth.GetAvatarUrl(account.UserId);
+
+                    if (String.IsNullOrEmpty(url))
+                    {
+                        AvatarFetchFailed.Add(account.UserId);
+                        continue;
+                    }
+
+                    account.AvatarUrl = url;
+
+                    byte[] bytes = await App.HttpClient.GetByteArrayAsync(url);
+
+                    var image = new BitmapImage();
+                    using (var stream = new MemoryStream(bytes))
+                    {
+                        image.BeginInit();
+                        image.CacheOption = BitmapCacheOption.OnLoad;
+                        image.StreamSource = stream;
+                        image.EndInit();
+                    }
+
+                    image.Freeze();
+
+                    AvatarCache[account.Id] = image;
+                }
+
+                App.Accounts.Save();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("AccountsViewModel::FetchMissingAvatars", $"Failed to fetch avatars: {ex.Message}");
+            }
+            finally
+            {
+                _isFetchingAvatars = false;
+            }
+
+            Application.Current?.Dispatcher.Invoke(RefreshStatic);
+        }
+
+        private static void RefreshStatic()
+        {
+            // refresh whichever page instance is currently showing, if any
+            if (Application.Current?.Windows.OfType<UI.Elements.Settings.MainWindow>().FirstOrDefault() is not UI.Elements.Settings.MainWindow window)
+                return;
+
+            if (window.RootFrame?.Content is UI.Elements.Settings.Pages.AccountsPage page)
+                page.ReloadViewModel();
         }
 
         private void AddAccount()

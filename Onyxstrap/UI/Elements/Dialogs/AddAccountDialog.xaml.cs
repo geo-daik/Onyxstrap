@@ -30,13 +30,13 @@ namespace Onyxstrap.UI.Elements.Dialogs
             OKButton.IsEnabled = !String.IsNullOrWhiteSpace(AccountNameTextBox.Text) && !String.IsNullOrWhiteSpace(AccountTokenTextBox.Password);
         }
 
-        private void OKButton_Click(object sender, RoutedEventArgs e)
+        private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
             Cursor = Cursors.Wait;
             OKButton.IsEnabled = false;
 
             // validate the token with roblox before accepting it
-            var validation = RobloxAuth.ValidateToken(SecurityToken).GetAwaiter().GetResult();
+            var validation = await RobloxAuth.ValidateToken(SecurityToken);
 
             if (validation is null)
             {
@@ -51,7 +51,10 @@ namespace Onyxstrap.UI.Elements.Dialogs
             if (String.IsNullOrWhiteSpace(AccountName))
                 AccountNameTextBox.Text = validation.Value.Username ?? "";
 
-            App.Accounts.AddAccount(AccountNameTextBox.Text.Trim(), SecurityToken, validation.Value.UserId);
+            // grab the avatar headshot while we're at it
+            string? avatarUrl = await RobloxAuth.GetAvatarUrl(validation.Value.UserId);
+
+            App.Accounts.AddAccount(AccountNameTextBox.Text.Trim(), SecurityToken, validation.Value.UserId, avatarUrl);
 
             Result = MessageBoxResult.OK;
             Close();
