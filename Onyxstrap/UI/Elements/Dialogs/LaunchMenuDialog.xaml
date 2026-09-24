@@ -15,6 +15,7 @@
         Width="640"
         SizeToContent="Height"
         ResizeMode="NoResize"
+        WindowStyle="None"
         ExtendsContentIntoTitleBar="True"
         WindowStartupLocation="CenterScreen"
         Background="Transparent" AllowsTransparency="True">
