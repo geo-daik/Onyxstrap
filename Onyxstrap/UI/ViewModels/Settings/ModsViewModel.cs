@@ -72,7 +72,10 @@ namespace Onyxstrap.UI.ViewModels.Settings
         public ModPresetTask OnyxLoadingScreenTask { get; } = new("OnyxLoadingScreen", new Dictionary<string, string>
         {
             { @"content\textures\loading\loadingTexture.png", "Onyxstrap.Resources.Onyx.loadingTexture.png" },
-            { @"content\textures\loading\darkLoadingTexture.png", "Onyxstrap.Resources.Onyx.darkLoadingTexture.png" }
+            { @"content\textures\loading\darkLoadingTexture.png", "Onyxstrap.Resources.Onyx.darkLoadingTexture.png" },
+            { @"content\textures\loading\loadingCircle.png", "Onyxstrap.Resources.Onyx.loadingCircle.png" },
+            { @"content\textures\DarkThemeLoadingCircle.png", "Onyxstrap.Resources.Onyx.DarkThemeLoadingCircle.png" },
+            { @"content\textures\LightThemeLoadingCircle.png", "Onyxstrap.Resources.Onyx.LightThemeLoadingCircle.png" }
         });
 
         public ModPresetTask OldCharacterSoundsTask { get; } = new("OldCharacterSounds", new()

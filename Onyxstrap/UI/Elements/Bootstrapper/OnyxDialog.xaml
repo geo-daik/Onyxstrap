@@ -64,7 +64,7 @@
     </Window.Triggers>
 
     <Grid>
-        <Border x:Name="RootBorder" CornerRadius="18" BorderBrush="#268A80DC" BorderThickness="1" Opacity="0">
+        <Border x:Name="RootBorder" CornerRadius="18" BorderBrush="#268A80DC" BorderThickness="1">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#FF1B1728" Offset="0" />
@@ -95,6 +95,20 @@
                     </Ellipse.Fill>
                 </Ellipse>
 
+                <!-- drifting particle field -->
+                <Canvas x:Name="ParticleCanvas" />
+
+                <!-- success burst -->
+                <Ellipse x:Name="SuccessFlash" Width="260" Height="260" Opacity="0" IsHitTestVisible="False"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,70">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#66B9AFFF" Offset="0" />
+                            <GradientStop Color="#00B9AFFF" Offset="1" />
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
                 <!-- close button -->
                 <Button VerticalAlignment="Top" HorizontalAlignment="Right" Width="34" Height="34" Margin="12"
                         BorderThickness="0" Foreground="#66E8E6F2" FontSize="14" FontFamily="{StaticResource Rubik}"
@@ -121,7 +135,7 @@
                         </Grid.RenderTransform>
 
                         <Ellipse x:Name="Halo" Width="142" Height="142" Stroke="#4D8A80DC" StrokeThickness="2"
-                                 StrokeDashArray="3 7" StrokeDashCap="Round" Opacity="0" RenderTransformOrigin="0.5,0.5">
+                                 StrokeDashArray="3 7" StrokeDashCap="Round" RenderTransformOrigin="0.5,0.5">
                             <Ellipse.RenderTransform>
                                 <RotateTransform x:Name="HaloRotate" Angle="0" />
                             </Ellipse.RenderTransform>
@@ -138,7 +152,7 @@
                         </Image>
                     </Grid>
 
-                    <TextBlock x:Name="Wordmark" HorizontalAlignment="Center" Margin="0,18,0,0" Opacity="0"
+                    <TextBlock x:Name="Wordmark" HorizontalAlignment="Center" Margin="0,18,0,0"
                                Text="O N Y X S T R A P" FontFamily="{StaticResource Rubik}" FontSize="24" FontWeight="SemiBold">
                         <TextBlock.Foreground>
                             <LinearGradientBrush>
@@ -148,7 +162,7 @@
                         </TextBlock.Foreground>
                     </TextBlock>
 
-                    <TextBlock x:Name="Tagline" HorizontalAlignment="Center" Margin="0,4,0,0" Opacity="0"
+                    <TextBlock x:Name="Tagline" HorizontalAlignment="Center" Margin="0,4,0,0"
                                Text="forged for Roblox" FontFamily="{StaticResource Rubik}" FontSize="12"
                                Foreground="#99B9AFFF" />
                 </StackPanel>

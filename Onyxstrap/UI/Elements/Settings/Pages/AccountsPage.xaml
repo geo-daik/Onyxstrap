@@ -51,10 +51,13 @@
             </TextBlock.Style>
         </TextBlock>
 
-        <ItemsControl ItemsSource="{Binding AccountEntries, Mode=OneWay}">
+        <ItemsControl x:Name="AccountsList" ItemsSource="{Binding AccountEntries, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ui:Card Margin="0,0,0,8" Padding="14,12">
+                    <ui:Card Margin="0,0,0,8" Padding="14,12" Loaded="AccountCard_Loaded">
+                        <ui:Card.RenderTransform>
+                            <TranslateTransform Y="14" />
+                        </ui:Card.RenderTransform>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />

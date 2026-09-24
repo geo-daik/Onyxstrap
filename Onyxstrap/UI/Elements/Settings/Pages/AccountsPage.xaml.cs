@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 using Onyxstrap.UI.ViewModels.Settings;
 
@@ -40,6 +42,34 @@ namespace Onyxstrap.UI.Elements.Settings.Pages
             }
 
             SetupViewModel();
+        }
+
+        /// <summary>
+        /// Staggers the account cards rising into place as they load.
+        /// </summary>
+        private void AccountCard_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Wpf.Ui.Controls.Card card || card.DataContext is not AccountsViewModel.AccountEntry entry)
+                return;
+
+            int index = 0;
+            if (_viewModel is not null)
+            {
+                var entries = _viewModel.AccountEntries.ToList();
+                index = Math.Max(0, entries.FindIndex(x => x.Id == entry.Id));
+            }
+
+            if (card.RenderTransform is not TranslateTransform transform)
+                return;
+
+            transform.BeginAnimation(
+                TranslateTransform.YProperty,
+                new System.Windows.Media.Animation.DoubleAnimation(14, 0, TimeSpan.FromMilliseconds(320))
+                {
+                    BeginTime = TimeSpan.FromMilliseconds(index * 55),
+                    EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+                }
+            );
         }
     }
 }

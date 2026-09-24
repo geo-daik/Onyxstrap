@@ -1,6 +1,9 @@
 using System.Windows;
 using System.ComponentModel;
+using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shell;
 
 using Onyxstrap.UI.Elements.Bootstrapper.Base;
@@ -61,6 +64,14 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
             {
                 _viewModel.ProgressValue = value;
                 _viewModel.OnPropertyChanged(nameof(_viewModel.ProgressValue));
+
+                // the halo tightens and brightens as the download advances
+                if (ProgressMaximum > 0)
+                {
+                    double ratio = Math.Clamp(ProgressValue / (double)ProgressMaximum, 0, 1);
+                    Halo.Opacity = 0.55 + 0.45 * ratio;
+                    Halo.StrokeThickness = 2 + 1.5 * ratio;
+                }
             }
         }
 
@@ -108,6 +119,51 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
             Icon = App.Settings.Prop.BootstrapperIcon.GetIcon().GetImageSource();
 
             InitializeComponent();
+
+            Loaded += (_, _) => SpawnParticles();
+        }
+
+        /// <summary>
+        /// Spawns a slow field of drifting violet motes behind the centerpiece.
+        /// </summary>
+        private void SpawnParticles()
+        {
+            var random = new Random(137);
+
+            for (int i = 0; i < 26; i++)
+            {
+                double size = 1.5 + random.NextDouble() * 2.5;
+                double duration = 7 + random.NextDouble() * 8;
+                double delay = random.NextDouble() * 9;
+
+                var particle = new System.Windows.Shapes.Ellipse
+                {
+                    Width = size,
+                    Height = size,
+                    Opacity = 0,
+                    Fill = new SolidColorBrush(Color.FromArgb((byte)(70 + random.Next(110)), 185, 175, 255))
+                };
+
+                Canvas.SetLeft(particle, random.NextDouble() * Math.Max(ActualWidth, 1));
+                Canvas.SetTop(particle, ActualHeight + 10);
+                ParticleCanvas.Children.Add(particle);
+
+                var drift = new DoubleAnimation(ActualHeight + 10, -20, TimeSpan.FromSeconds(duration))
+                {
+                    BeginTime = TimeSpan.FromSeconds(delay),
+                    RepeatBehavior = RepeatBehavior.Forever
+                };
+
+                var flicker = new DoubleAnimation(0.1, 0.6, TimeSpan.FromSeconds(1.2 + random.NextDouble() * 1.6))
+                {
+                    AutoReverse = true,
+                    RepeatBehavior = RepeatBehavior.Forever,
+                    BeginTime = TimeSpan.FromSeconds(delay)
+                };
+
+                particle.BeginAnimation(Canvas.TopProperty, drift);
+                particle.BeginAnimation(OpacityProperty, flicker);
+            }
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -125,7 +181,40 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
             Dispatcher.BeginInvoke(this.Close);
         }
 
-        public void ShowSuccess(string message, Action? callback) => BaseFunctions.ShowSuccess(message, callback);
+        /// <summary>
+        /// Plays an in-dialog success burst instead of throwing up a generic
+        /// message box: halo flash, then hand off to the callback and terminate.
+        /// </summary>
+        public void ShowSuccess(string message, Action? callback)
+        {
+            Message = message;
+            _isClosing = true;
+
+            Halo.Opacity = 1;
+            Halo.StrokeThickness = 4;
+
+            var flash = new DoubleAnimation(0, 0.9, TimeSpan.FromSeconds(0.4))
+            {
+                AutoReverse = true,
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            SuccessFlash.BeginAnimation(OpacityProperty, flash);
+
+            var timer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1.3)
+            };
+
+            timer.Tick += (_, _) =>
+            {
+                timer.Stop();
+                callback?.Invoke();
+                App.Terminate();
+            };
+
+            timer.Start();
+        }
         #endregion
     }
 }

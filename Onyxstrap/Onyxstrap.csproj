@@ -52,6 +52,9 @@
     <EmbeddedResource Include="Resources\Mods\OldAvatarBackground.rbxl" />
     <EmbeddedResource Include="Resources\Onyx\loadingTexture.png" />
     <EmbeddedResource Include="Resources\Onyx\darkLoadingTexture.png" />
+    <EmbeddedResource Include="Resources\Onyx\loadingCircle.png" />
+    <EmbeddedResource Include="Resources\Onyx\DarkThemeLoadingCircle.png" />
+    <EmbeddedResource Include="Resources\Onyx\LightThemeLoadingCircle.png" />
   </ItemGroup>
 
   <ItemGroup>
