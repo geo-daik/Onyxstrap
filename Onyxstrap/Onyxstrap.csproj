@@ -50,6 +50,8 @@
     <EmbeddedResource Include="Resources\Mods\Sounds\OldWalk.mp3" />
     <EmbeddedResource Include="Resources\Mods\Sounds\Empty.mp3" />
     <EmbeddedResource Include="Resources\Mods\OldAvatarBackground.rbxl" />
+    <EmbeddedResource Include="Resources\Onyx\loadingTexture.png" />
+    <EmbeddedResource Include="Resources\Onyx\darkLoadingTexture.png" />
   </ItemGroup>
 
   <ItemGroup>

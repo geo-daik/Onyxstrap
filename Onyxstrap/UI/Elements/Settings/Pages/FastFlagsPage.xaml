@@ -15,6 +15,28 @@
     <StackPanel Margin="0,0,14,14">
         <TextBlock Margin="0,0,0,16" Text="{x:Static resources:Strings.Menu_FastFlags_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
+        <controls:OptionControl
+            Header="Onyx quick presets"
+            Description="One-click flag bundles, applied to the active account's flag set. These set/remove only the flags listed on each button - everything else is left alone. Committed together with your other changes via Save.">
+            <WrapPanel>
+                <ui:Button Margin="2" Content="Max FPS" Appearance="Primary"
+                           ToolTip="DFIntTaskSchedulerTargetFps=999, FFlagTaskSchedulerLimitTargetFpsTo2402=False"
+                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Max FPS" />
+                <ui:Button Margin="2" Content="Balanced"
+                           ToolTip="FIntDebugForceMSAASamples=2, DFFlagTextureQualityOverrideEnabled=True, DFIntTextureQualityOverride=2"
+                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Balanced" />
+                <ui:Button Margin="2" Content="Potato"
+                           ToolTip="FIntDebugForceMSAASamples=1, DFFlagTextureQualityOverrideEnabled=True, DFIntTextureQualityOverride=0"
+                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Potato" />
+                <ui:Button Margin="2" Content="Future lighting"
+                           ToolTip="FFlagDebugForceFutureIsBrightPhase3=True (experimental, heavier GPU load)"
+                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Future lighting" />
+                <ui:Button Margin="2" Content="Reset" Appearance="Danger"
+                           ToolTip="Remove every flag that the quick presets can set"
+                           Command="{Binding ResetQuickPresetsCommand}" />
+            </WrapPanel>
+        </controls:OptionControl>
+
         <controls:OptionControl 
             Header="{x:Static resources:Strings.Menu_FastFlags_ManagerEnabled_Title}"
             Description="{x:Static resources:Strings.Menu_FastFlags_ManagerEnabled_Description}">

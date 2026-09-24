@@ -1446,6 +1446,12 @@ Defaulting to {1}.</value>
   <data name="Dialog.RemoveAccount.Title" xml:space="preserve">
     <value>Remove account</value>
   </data>
+  <data name="Menu.Mods.OnyxLoadingScreen.Title" xml:space="preserve">
+    <value>Onyx loading screen</value>
+  </data>
+  <data name="Menu.Mods.OnyxLoadingScreen.Description" xml:space="preserve">
+    <value>Replace the Roblox loading screen background with a deep onyx one with a violet glow, in both light and dark themes.</value>
+  </data>
   <data name="Dialog.RemoveAccount.Confirm" xml:space="preserve">
     <value>Are you sure you want to remove {0} from Onyxstrap? This does not sign you out anywhere.</value>
   </data>

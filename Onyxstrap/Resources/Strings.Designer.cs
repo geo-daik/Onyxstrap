@@ -3801,6 +3801,24 @@ namespace Onyxstrap.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Onyx loading screen.
+        /// </summary>
+        public static string Menu_Mods_OnyxLoadingScreen_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.OnyxLoadingScreen.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Replace the Roblox loading screen background with a deep onyx one with a violet glow, in both light and dark themes..
+        /// </summary>
+        public static string Menu_Mods_OnyxLoadingScreen_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.OnyxLoadingScreen.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Rebrand the game window icon.
         /// </summary>
         public static string Menu_Onyxstrap_GameIconRebrand_Title {

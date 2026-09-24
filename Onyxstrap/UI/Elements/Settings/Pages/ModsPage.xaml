@@ -62,6 +62,12 @@
             </ComboBox>
         </controls:OptionControl>
 
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_Mods_OnyxLoadingScreen_Title}"
+            Description="{x:Static resources:Strings.Menu_Mods_OnyxLoadingScreen_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding OnyxLoadingScreenTask.NewState, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <controls:OptionControl 
             Header="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Title}" 
             Description="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Description}">

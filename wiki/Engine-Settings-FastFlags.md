@@ -10,6 +10,20 @@ Open **Onyxstrap → Settings → Engine Settings**. The simple view covers comm
 - Flags are written to `Modifications\ClientSettings\ClientAppSettings.json` in the install folder and copied into the installed Roblox version at every launch — so they **survive Roblox updates**.
 - Most custom flags are ignored by the modern client due to Roblox's **flag allowlist** — presets in the UI still work, arbitrary flags may not.
 
+## Onyx quick presets
+
+The top of the Engine Settings page has one-click bundles applied to the active account's flag set:
+
+- **Max FPS** — removes the internal FPS cap (`DFIntTaskSchedulerTargetFps=999` + cap-off flag). Hover a button to see exactly which flags it sets.
+- **Balanced** — 2x MSAA, texture quality 2.
+- **Potato** — MSAA 1, texture quality 0 (for weak hardware).
+- **Future lighting** — forces Roblox's newer lighting (experimental: heavier GPU load, not all games like it).
+- **Reset** — removes every flag these presets can set; your other flags are untouched.
+
+Presets are committed together with your other flag edits via the Save button, and (like all your flags) they are saved per-account.
+
+> **Why there's no "force dark theme" preset:** older theme-forcing flags (`FStringForcedTheme` and friends) are stripped by Roblox's flag allowlist and no longer work. The in-game menu follows the theme setting of the account you're logged into (in-game menu → Settings → Dark).
+
 ## Per-account flag sets
 
 This is Onyxstrap's twist on FastFlags: **each saved account has its own flag set**.

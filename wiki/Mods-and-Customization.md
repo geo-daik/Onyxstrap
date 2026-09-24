@@ -6,6 +6,12 @@ Anything you place in `Modifications\` inside Onyxstrap's install folder gets co
 
 Examples: custom textures (in the right `content\...` subfolder), custom fonts (use the font option in settings, it's safer), sounds.
 
+## Onyx loading screen
+
+**Settings → Mods → Onyx loading screen** *(off by default)* replaces the Roblox loading screen background with a deep onyx gradient with a violet glow — in both light and dark client themes. It works by shipping our own version of the loading textures (`content	extures\loading\`) through the mods pipeline, so it survives Roblox updates and disappears cleanly when toggled off.
+
+Combined with the [cutscene bootstrapper](Mods-and-Customization) and the gem taskbar icon, the whole launch flow is Onyx-branded.
+
 ## Bootstrapper styles
 
 **Settings → Behaviour → Bootstrapper style** picks what you see while Onyxstrap prepares Roblox:
