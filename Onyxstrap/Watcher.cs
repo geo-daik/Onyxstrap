@@ -178,7 +178,7 @@ namespace Onyxstrap
                     if (gameProcesses.Count == 0 && !Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
                         return;
 
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                 }
             }
             catch (Exception ex)

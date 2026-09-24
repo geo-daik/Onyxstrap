@@ -67,9 +67,109 @@ namespace Onyxstrap.UI.ViewModels.Settings
 
         private void ResetQuickPresets()
         {
-            foreach (string key in QuickPresetFlagKeys)
+            foreach (string key in AllPresetFlagKeys)
                 App.FastFlags.SetValue(key, null);
         }
+
+        // Game presets: flag bundles tuned per game genre. The engine flags are
+        // global, so "for a game" means the mix that plays best in that genre -
+        // FPS headroom, render quality, and latency trade-offs.
+        public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GamePresets = new Dictionary<string, IReadOnlyDictionary<string, string>>
+        {
+            ["Simulators (Blox Fruits, Pet Sim)"] = new Dictionary<string, string>
+            {
+                // grinding games are particle/UI heavy - everything on low, uncapped FPS
+                ["DFIntTaskSchedulerTargetFps"] = "999",
+                ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
+                ["DFFlagTextureQualityOverrideEnabled"] = "True",
+                ["DFIntTextureQualityOverride"] = "0",
+                ["FIntDebugForceMSAASamples"] = "1",
+                ["FIntRenderShadowIntensity"] = "0",
+                ["FFlagDisablePostFx"] = "True"
+            },
+            ["Shooters (Arsenal, Phantom Forces)"] = new Dictionary<string, string>
+            {
+                // latency first: uncapped FPS, low detail, D3D11 for the most stable frame pacing
+                ["DFIntTaskSchedulerTargetFps"] = "999",
+                ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
+                ["DFFlagTextureQualityOverrideEnabled"] = "True",
+                ["DFIntTextureQualityOverride"] = "1",
+                ["FIntDebugForceMSAASamples"] = "1",
+                ["FIntRenderShadowIntensity"] = "0",
+                ["FFlagDisablePostFx"] = "True",
+                ["FFlagDebugGraphicsPreferD3D11"] = "True"
+            },
+            ["Obby / Parkour"] = new Dictionary<string, string>
+            {
+                // precision platforming wants frame consistency over eye candy
+                ["DFIntTaskSchedulerTargetFps"] = "999",
+                ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
+                ["DFFlagTextureQualityOverrideEnabled"] = "True",
+                ["DFIntTextureQualityOverride"] = "1",
+                ["FIntDebugForceMSAASamples"] = "1",
+                ["FFlagDisablePostFx"] = "True"
+            },
+            ["Roleplay (Brookhaven, Adopt Me)"] = new Dictionary<string, string>
+            {
+                // social hangouts - keep it pretty, still smooth
+                ["DFIntTaskSchedulerTargetFps"] = "120",
+                ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
+                ["DFFlagTextureQualityOverrideEnabled"] = "True",
+                ["DFIntTextureQualityOverride"] = "2",
+                ["FIntDebugForceMSAASamples"] = "2"
+            },
+            ["Story / Horror (Doors)"] = new Dictionary<string, string>
+            {
+                // atmosphere is the point - keep quality, modest FPS target
+                ["DFIntTaskSchedulerTargetFps"] = "120",
+                ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
+                ["DFFlagTextureQualityOverrideEnabled"] = "True",
+                ["DFIntTextureQualityOverride"] = "3",
+                ["FIntDebugForceMSAASamples"] = "4"
+            },
+            ["Competitive (ranked, tournament)"] = new Dictionary<string, string>
+            {
+                // same as shooters but rock-solid 240 target for high-refresh monitors
+                ["DFIntTaskSchedulerTargetFps"] = "240",
+                ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
+                ["DFFlagTextureQualityOverrideEnabled"] = "True",
+                ["DFIntTextureQualityOverride"] = "1",
+                ["FIntDebugForceMSAASamples"] = "1",
+                ["FIntRenderShadowIntensity"] = "0",
+                ["FFlagDisablePostFx"] = "True",
+                ["FFlagDebugGraphicsPreferD3D11"] = "True"
+            }
+        };
+
+        public IReadOnlyCollection<string> GamePresetNames => GamePresets.Keys.ToList();
+
+        private string? _selectedGamePreset;
+
+        public string? SelectedGamePreset
+        {
+            get => _selectedGamePreset ?? GamePresetNames.FirstOrDefault();
+            set
+            {
+                _selectedGamePreset = value;
+                OnPropertyChanged(nameof(SelectedGamePreset));
+            }
+        }
+
+        public ICommand ApplyGamePresetCommand => new RelayCommand(ApplyGamePreset);
+
+        private void ApplyGamePreset()
+        {
+            if (SelectedGamePreset is not null && GamePresets.TryGetValue(SelectedGamePreset, out var flags))
+            {
+                foreach (var pair in flags)
+                    App.FastFlags.SetValue(pair.Key, pair.Value);
+            }
+        }
+
+        public static IEnumerable<string> AllPresetFlagKeys =>
+            QuickPresets.Values.SelectMany(x => x.Keys)
+            .Concat(GamePresets.Values.SelectMany(x => x.Keys))
+            .Distinct();
 
         public Visibility CanShowFastFlagEditor => App.IsStudioInstalled ? Visibility.Visible : Visibility.Collapsed;
 

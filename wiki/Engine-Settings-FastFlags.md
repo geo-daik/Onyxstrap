@@ -24,6 +24,21 @@ Presets are committed together with your other flag edits via the Save button, a
 
 > **Why there's no "force dark theme" preset:** older theme-forcing flags (`FStringForcedTheme` and friends) are stripped by Roblox's flag allowlist and no longer work. The in-game menu follows the theme setting of the account you're logged into (in-game menu → Settings → Dark).
 
+## Game presets
+
+Under the quick presets there's a **Game presets** selector - flag bundles tuned for a game *genre*, since engine flags are global and what differs is the right trade-off per game type:
+
+- **Simulators** (Blox Fruits, Pet Sim) - uncapped FPS, everything low; grinding games are particle/UI heavy
+- **Shooters** (Arsenal, Phantom Forces) - uncapped FPS, low detail, D3D11 for stable frame pacing, shadows and post-FX off
+- **Obby / Parkour** - frame consistency over eye candy
+- **Roleplay** (Brookhaven, Adopt Me) - 120 FPS, keep it pretty
+- **Story / Horror** (Doors) - quality and atmosphere, modest 120 target
+- **Competitive** - solid 240 target, low detail, D3D11
+
+Pick one, hit **Apply** - it lands in the active account's flag set like everything else. **Reset all presets** clears every flag any preset can set.
+
+A note on honesty: the FPS-cap and quality flags are the long-standing workhorses; shadow intensity, post-FX and the D3D11 preference depend on what Roblox's allowlist permits at any given time - hover tooltips tell you exactly what gets set, and if a flag is ignored it simply does nothing.
+
 ## Per-account flag sets
 
 This is Onyxstrap's twist on FastFlags: **each saved account has its own flag set**.

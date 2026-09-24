@@ -37,6 +37,21 @@
             </WrapPanel>
         </controls:OptionControl>
 
+        <controls:OptionControl
+            Header="Game presets"
+            Description="Flag bundles tuned for a game genre - frame pacing, detail level and latency trade-offs. Applied to the active account's flag set, committed with Save.">
+            <StackPanel Orientation="Horizontal">
+                <ComboBox Margin="2" Width="320" Padding="10,5,10,5"
+                          ItemsSource="{Binding GamePresetNames, Mode=OneTime}"
+                          SelectedItem="{Binding SelectedGamePreset, Mode=TwoWay}" />
+                <ui:Button Margin="6,2,2,2" Content="Apply" Appearance="Primary"
+                           Command="{Binding ApplyGamePresetCommand}" />
+                <ui:Button Margin="2" Content="Reset all presets" Appearance="Danger"
+                           ToolTip="Remove every flag set by the quick and game presets"
+                           Command="{Binding ResetQuickPresetsCommand}" />
+            </StackPanel>
+        </controls:OptionControl>
+
         <controls:OptionControl 
             Header="{x:Static resources:Strings.Menu_FastFlags_ManagerEnabled_Title}"
             Description="{x:Static resources:Strings.Menu_FastFlags_ManagerEnabled_Description}">
