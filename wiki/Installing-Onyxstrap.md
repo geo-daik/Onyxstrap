@@ -13,6 +13,8 @@
 
 > **Heads-up:** registering the protocols means Onyxstrap replaces whatever bootstrapper handled them before (the stock launcher, Bloxstrap, Voidstrap, ...). Your other bootstrapper isn't removed — run its installer again if you want it back.
 
+The installer itself is Onyxstrap-branded too: an onyx hero strip up top, violet accents, and fade transitions between the steps.
+
 ## The launch menu
 
 Launching `Onyxstrap.exe` directly (for example from the Start Menu shortcut) opens the launch menu, where you can start Roblox or Studio without going through the website, and open settings.
