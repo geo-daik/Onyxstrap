@@ -27,7 +27,7 @@ namespace Onyxstrap
 
         public bool CreateStartMenuShortcuts = true;
 
-        public bool EnableAnalytics = true;
+        public bool EnableAnalytics = false;
 
         public bool IsImplicitInstall = false;
 
