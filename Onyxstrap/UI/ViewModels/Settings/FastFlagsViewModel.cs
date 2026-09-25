@@ -56,6 +56,25 @@ namespace Onyxstrap.UI.ViewModels.Settings
 
         public ICommand ResetQuickPresetsCommand => new RelayCommand(ResetQuickPresets);
 
+        /// <summary>
+        /// Feedback line under the preset sections, so applying a preset is
+        /// visibly acknowledged instead of silently staging flags.
+        /// </summary>
+        public string LastActionMessage
+        {
+            get => _lastActionMessage;
+            private set
+            {
+                _lastActionMessage = value;
+                OnPropertyChanged(nameof(LastActionMessage));
+                OnPropertyChanged(nameof(LastActionVisibility));
+            }
+        }
+
+        private string _lastActionMessage = "";
+
+        public Visibility LastActionVisibility => string.IsNullOrEmpty(_lastActionMessage) ? Visibility.Collapsed : Visibility.Visible;
+
         private void ApplyQuickPreset(string name)
         {
             if (!QuickPresets.TryGetValue(name, out var flags))
@@ -63,12 +82,26 @@ namespace Onyxstrap.UI.ViewModels.Settings
 
             foreach (var pair in flags)
                 App.FastFlags.SetValue(pair.Key, pair.Value);
+
+            CommitPresets($"Applied '{name}' - saved to the active account's flags.");
         }
 
         private void ResetQuickPresets()
         {
             foreach (string key in AllPresetFlagKeys)
                 App.FastFlags.SetValue(key, null);
+
+            CommitPresets("Removed every flag set by the presets.");
+        }
+
+        /// <summary>
+        /// Presets commit immediately (and sync into the active account's set)
+        /// so a click has an instant, visible effect.
+        /// </summary>
+        private void CommitPresets(string message)
+        {
+            App.FastFlags.Save();
+            LastActionMessage = message;
         }
 
         // Game presets: flag bundles tuned per game genre. The engine flags are
@@ -163,6 +196,8 @@ namespace Onyxstrap.UI.ViewModels.Settings
             {
                 foreach (var pair in flags)
                     App.FastFlags.SetValue(pair.Key, pair.Value);
+
+                CommitPresets($"Applied '{SelectedGamePreset}' - saved to the active account's flags.");
             }
         }
 

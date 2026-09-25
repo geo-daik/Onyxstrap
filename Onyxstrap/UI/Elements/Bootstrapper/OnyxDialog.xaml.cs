@@ -65,12 +65,17 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
                 _viewModel.ProgressValue = value;
                 _viewModel.OnPropertyChanged(nameof(_viewModel.ProgressValue));
 
-                // the halo tightens and brightens as the download advances
+                // the halo tightens and brightens as the download advances;
+                // this setter is called from the bootstrapper's background
+                // thread, so the element update must be marshaled to the UI
                 if (ProgressMaximum > 0)
                 {
                     double ratio = Math.Clamp(ProgressValue / (double)ProgressMaximum, 0, 1);
-                    Halo.Opacity = 0.55 + 0.45 * ratio;
-                    Halo.StrokeThickness = 2 + 1.5 * ratio;
+                    SafeOnUi(() =>
+                    {
+                        Halo.Opacity = 0.55 + 0.45 * ratio;
+                        Halo.StrokeThickness = 2 + 1.5 * ratio;
+                    });
                 }
             }
         }
@@ -121,6 +126,27 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
             InitializeComponent();
 
             Loaded += (_, _) => SpawnParticles();
+        }
+
+        /// <summary>
+        /// Runs a UI-thread action; swallows failures so a cosmetic animation
+        /// can never take the bootstrapper down.
+        /// </summary>
+        private static void SafeOnUi(Action action)
+        {
+            try
+            {
+                var dispatcher = System.Windows.Application.Current?.Dispatcher;
+
+                if (dispatcher is null || dispatcher.CheckAccess())
+                    action();
+                else
+                    dispatcher.BeginInvoke(action);
+            }
+            catch
+            {
+                // cosmetic only - never let this break a launch
+            }
         }
 
         /// <summary>
@@ -184,36 +210,51 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
         /// <summary>
         /// Plays an in-dialog success burst instead of throwing up a generic
         /// message box: halo flash, then hand off to the callback and terminate.
+        /// Everything UI-touching runs on the dispatcher; if anything goes
+        /// wrong we fall back to the stock success flow.
         /// </summary>
         public void ShowSuccess(string message, Action? callback)
         {
-            Message = message;
-            _isClosing = true;
-
-            Halo.Opacity = 1;
-            Halo.StrokeThickness = 4;
-
-            var flash = new DoubleAnimation(0, 0.9, TimeSpan.FromSeconds(0.4))
+            try
             {
-                AutoReverse = true,
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
+                Message = message;
+                _isClosing = true;
 
-            SuccessFlash.BeginAnimation(OpacityProperty, flash);
+                SafeOnUi(() =>
+                {
+                    Halo.Opacity = 1;
+                    Halo.StrokeThickness = 4;
 
-            var timer = new System.Windows.Threading.DispatcherTimer
+                    var flash = new DoubleAnimation(0, 0.9, TimeSpan.FromSeconds(0.4))
+                    {
+                        AutoReverse = true,
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+
+                    SuccessFlash.BeginAnimation(OpacityProperty, flash);
+
+                    // the timer must live on the dispatcher or its tick never fires
+                    var timer = new System.Windows.Threading.DispatcherTimer
+                    {
+                        Interval = TimeSpan.FromSeconds(1.3)
+                    };
+
+                    timer.Tick += (_, _) =>
+                    {
+                        timer.Stop();
+                        callback?.Invoke();
+                        App.Terminate();
+                    };
+
+                    timer.Start();
+                });
+            }
+            catch
             {
-                Interval = TimeSpan.FromSeconds(1.3)
-            };
-
-            timer.Tick += (_, _) =>
-            {
-                timer.Stop();
+                // never break the launch over the celebration
                 callback?.Invoke();
                 App.Terminate();
-            };
-
-            timer.Start();
+            }
         }
         #endregion
     }

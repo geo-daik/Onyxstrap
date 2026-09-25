@@ -72,6 +72,10 @@
             </StackPanel>
         </controls:OptionControl>
 
+        <TextBlock Margin="4,6,0,0" FontSize="13" Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                   Text="{Binding LastActionMessage, Mode=OneWay}"
+                   Visibility="{Binding LastActionVisibility, Mode=OneWay}" />
+
         <controls:OptionControl 
             Header="{x:Static resources:Strings.Menu_FastFlags_ManagerEnabled_Title}"
             Description="{x:Static resources:Strings.Menu_FastFlags_ManagerEnabled_Description}">
