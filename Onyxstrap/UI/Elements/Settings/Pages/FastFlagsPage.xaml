@@ -44,13 +44,58 @@
                            Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Max FPS" />
                 <ui:Button Margin="2" Content="Balanced"
                            ToolTip="FIntDebugForceMSAASamples=2, DFFlagTextureQualityOverrideEnabled=True, DFIntTextureQualityOverride=2"
-                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Balanced" />
+                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Balanced" >
+                    <ui:Button.Style>
+                        <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding LastAppliedPreset, Mode=OneWay}" Value="Balanced" />
+                                        <Condition Binding="{Binding LastActionVisibility}" Value="Visible" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#667C6FD8" />
+                                    <Setter Property="BorderBrush" Value="#FF8A80DC" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
                 <ui:Button Margin="2" Content="Potato"
                            ToolTip="FIntDebugForceMSAASamples=1, DFFlagTextureQualityOverrideEnabled=True, DFIntTextureQualityOverride=0"
-                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Potato" />
+                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Potato" >
+                    <ui:Button.Style>
+                        <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding LastAppliedPreset, Mode=OneWay}" Value="Potato" />
+                                        <Condition Binding="{Binding LastActionVisibility}" Value="Visible" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#667C6FD8" />
+                                    <Setter Property="BorderBrush" Value="#FF8A80DC" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
                 <ui:Button Margin="2" Content="Future lighting"
                            ToolTip="FFlagDebugForceFutureIsBrightPhase3=True (experimental, heavier GPU load)"
-                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Future lighting" />
+                           Command="{Binding ApplyQuickPresetCommand}" CommandParameter="Future lighting" >
+                    <ui:Button.Style>
+                        <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding LastAppliedPreset, Mode=OneWay}" Value="Future lighting" />
+                                        <Condition Binding="{Binding LastActionVisibility}" Value="Visible" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#667C6FD8" />
+                                    <Setter Property="BorderBrush" Value="#FF8A80DC" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
                 <ui:Button Margin="2" Content="Reset" Appearance="Danger"
                            ToolTip="Remove every flag that the quick presets can set"
                            Command="{Binding ResetQuickPresetsCommand}" />

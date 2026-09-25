@@ -83,6 +83,7 @@ namespace Onyxstrap.UI.ViewModels.Settings
             foreach (var pair in flags)
                 App.FastFlags.SetValue(pair.Key, pair.Value);
 
+            LastAppliedPreset = name;
             CommitPresets($"Applied '{name}' - saved to the active account's flags.");
         }
 
@@ -91,6 +92,7 @@ namespace Onyxstrap.UI.ViewModels.Settings
             foreach (string key in AllPresetFlagKeys)
                 App.FastFlags.SetValue(key, null);
 
+            LastAppliedPreset = null;
             CommitPresets("Removed every flag set by the presets.");
         }
 
@@ -98,9 +100,26 @@ namespace Onyxstrap.UI.ViewModels.Settings
         /// Presets commit immediately (and sync into the active account's set)
         /// so a click has an instant, visible effect.
         /// </summary>
+        public string? LastAppliedPreset
+        {
+            get => _lastAppliedPreset;
+            private set
+            {
+                _lastAppliedPreset = value;
+                OnPropertyChanged(nameof(LastAppliedPreset));
+            }
+        }
+
+        private string? _lastAppliedPreset;
+
         private void CommitPresets(string message)
         {
             App.FastFlags.Save();
+
+            // re-raise every binding on the page so the MSAA/texture dropdowns
+            // and toggles immediately reflect the applied preset
+            OnPropertyChanged(string.Empty);
+
             LastActionMessage = message;
         }
 
@@ -197,6 +216,7 @@ namespace Onyxstrap.UI.ViewModels.Settings
                 foreach (var pair in flags)
                     App.FastFlags.SetValue(pair.Key, pair.Value);
 
+                LastAppliedPreset = $"game:{SelectedGamePreset}";
                 CommitPresets($"Applied '{SelectedGamePreset}' - saved to the active account's flags.");
             }
         }
