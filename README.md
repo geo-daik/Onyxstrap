@@ -37,14 +37,14 @@ Accounts are saved by their `.ROBLOSECURITY` session token rather than your pass
 
 ## Documentation
 
-Help lives in the [wiki](wiki/Home):
+Help lives in the [wiki](https://github.com/geo-daik/Onyxstrap/wiki):
 
-- [Installing Onyxstrap](wiki/Installing-Onyxstrap.md)
-- [Account Manager](wiki/Account-Manager.md) — saving accounts, switching, token security
-- [Engine Settings (FastFlags)](wiki/Engine-Settings-FastFlags.md) — per-account flag sets and presets
-- [Mods & Customization](wiki/Mods-and-Customization.md) — bootstrapper styles, the game-window rebrand
-- [Troubleshooting](wiki/Troubleshooting.md)
-- [Security & Privacy](wiki/Security-and-Privacy.md)
+- [Installing Onyxstrap](https://github.com/geo-daik/Onyxstrap/wiki/Installing-Onyxstrap)
+- [Account Manager](https://github.com/geo-daik/Onyxstrap/wiki/Account-Manager) — saving accounts, switching, token security
+- [Engine Settings (FastFlags)](https://github.com/geo-daik/Onyxstrap/wiki/Engine-Settings-FastFlags) — per-account flag sets and presets
+- [Mods & Customization](https://github.com/geo-daik/Onyxstrap/wiki/Mods-and-Customization) — bootstrapper styles, the game-window rebrand
+- [Troubleshooting](https://github.com/geo-daik/Onyxstrap/wiki/Troubleshooting)
+- [Security & Privacy](https://github.com/geo-daik/Onyxstrap/wiki/Security-and-Privacy)
 
 ## Building from source
 
