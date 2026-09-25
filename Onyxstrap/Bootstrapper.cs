@@ -1575,7 +1575,7 @@ namespace Onyxstrap
 
                         Frontend.ShowConnectivityDialog(
                             Strings.Dialog_Connectivity_UnableToDownload,
-                            String.Format(Strings.Dialog_Connectivity_UnableToDownloadReason, "[https://github.com/onyxstrap-community/onyxstrap/wiki/onyxstrap-cannot-download-roblox/](https://github.com/onyxstrap-community/onyxstrap/wiki/onyxstrap-cannot-download-roblox/)"),
+                            String.Format(Strings.Dialog_Connectivity_UnableToDownloadReason, "[https://github.com/geo-daik/Onyxstrap/wiki/onyxstrap-cannot-download-roblox/](https://github.com/geo-daik/Onyxstrap/wiki/onyxstrap-cannot-download-roblox/)"),
                             MessageBoxImage.Error,
                             ex
                         );

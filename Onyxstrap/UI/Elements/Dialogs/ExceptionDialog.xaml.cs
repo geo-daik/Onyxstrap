@@ -27,7 +27,7 @@ namespace Onyxstrap.UI.Elements.Dialogs
                 LocateLogFileButton.Content = Strings.Dialog_Exception_CopyLogContents;
 
             string repoUrl = $"https://github.com/{App.ProjectRepository}";
-            string wikiUrl = $"https://github.com/onyxstrap-community/onyxstrap/wiki/";
+            string wikiUrl = $"https://github.com/geo-daik/Onyxstrap/wiki/";
 
             string title = HttpUtility.UrlEncode($"[BUG] {exception.GetType()}: {exception.Message}");
             string log = HttpUtility.UrlEncode(App.Logger.AsDocument);

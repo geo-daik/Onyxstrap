@@ -1,8 +1,15 @@
-# Onyxstrap
+<p align="center">
+    <img src="Images/Onyxstrap-full-dark.png#gh-dark-mode-only" width="440">
+    <img src="Images/Onyxstrap-full-light.png#gh-light-mode-only" width="440">
+</p>
 
 > An alternative bootstrapper for Roblox with a built-in account manager, forked from [Bloxstrap](https://github.com/bloxstraplabs/bloxstrap).
 
 Onyxstrap is a free, open-source launcher for Roblox on Windows 10+. It does everything Bloxstrap does, and adds its own account management features on top.
+
+## Download
+
+Grab the latest build from the [releases page](https://github.com/geo-daik/Onyxstrap/releases/latest) and run `Onyxstrap.exe`.
 
 ## Features
 

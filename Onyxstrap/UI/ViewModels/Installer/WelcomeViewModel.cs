@@ -5,7 +5,7 @@ namespace Onyxstrap.UI.ViewModels.Installer
         // formatting is done here instead of in xaml, it's just a bit easier
         public string MainText => String.Format(
             Strings.Installer_Welcome_MainText,
-            "[github.com/onyxstrap-community/onyxstrap](https://github.com/onyxstrap-community/onyxstrap)",
+            "[github.com/geo-daik/Onyxstrap](https://github.com/geo-daik/Onyxstrap)",
             "[onyxstrap.dev](https://onyxstrap.dev)"
         );
 

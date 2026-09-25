@@ -13,7 +13,7 @@ namespace Onyxstrap.Utility
         {
             foreach (var drive in DriveInfo.GetDrives())
             {
-                // https://github.com/onyxstrap-community/onyxstrap/issues/1648#issuecomment-2192571030
+                // https://github.com/geo-daik/Onyxstrap/issues/1648#issuecomment-2192571030
                 if (path.ToUpperInvariant().StartsWith(drive.Name))
                     return drive.AvailableFreeSpace;
             }

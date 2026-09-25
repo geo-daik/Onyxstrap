@@ -114,7 +114,7 @@ namespace Onyxstrap.UI.Elements.Controls
             var lastBlock = document.Last();
 
             // matt was evidently very tired on the night he was first writing this
-            // https://github.com/onyxstrap-community/onyxstrap/blob/289b9dec77cf35b2cc6504019bc9c7701626be1f/Onyxstrap/UI/Elements/Controls/MarkdownTextBlock.cs#L111
+            // https://github.com/geo-daik/Onyxstrap/blob/289b9dec77cf35b2cc6504019bc9c7701626be1f/Onyxstrap/UI/Elements/Controls/MarkdownTextBlock.cs#L111
             foreach (var block in document)
             {
                 if (block is not ParagraphBlock paragraphBlock || paragraphBlock.Inline is null)

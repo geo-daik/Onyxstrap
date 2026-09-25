@@ -24,7 +24,7 @@ namespace Onyxstrap.UI
 
             string info = String.Format(
                 Strings.Dialog_PlayerError_FailedLaunch,
-                $"https://github.com/onyxstrap-community/onyxstrap/wiki/roblox-crashes-or-does-not-launch/"
+                $"https://github.com/geo-daik/Onyxstrap/wiki/roblox-crashes-or-does-not-launch/"
             );
 
             ShowMessageBox(info, MessageBoxImage.Error);

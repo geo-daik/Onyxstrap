@@ -19,10 +19,10 @@ namespace Onyxstrap
         public const string ProjectName = "Onyxstrap";
 #endif
         public const string ProjectOwner = "Onyxstrap";
-        public const string ProjectRepository = "onyxstrap-community/onyxstrap";
+        public const string ProjectRepository = "geo-daik/Onyxstrap";
         public const string ProjectDownloadLink = "https://onyxstrap.dev";
-        public const string ProjectHelpLink = "https://github.com/onyxstrap-community/onyxstrap/wiki/";
-        public const string ProjectSupportLink = "https://github.com/onyxstrap-community/onyxstrap/issues/new";
+        public const string ProjectHelpLink = "https://github.com/geo-daik/Onyxstrap/wiki/";
+        public const string ProjectSupportLink = "https://github.com/geo-daik/Onyxstrap/issues/new";
 
         public const string RobloxPlayerAppName = "RobloxPlayerBeta";
         public const string RobloxStudioAppName = "RobloxStudioBeta";
