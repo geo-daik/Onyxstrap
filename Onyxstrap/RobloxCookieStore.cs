@@ -47,6 +47,13 @@ namespace Onyxstrap
                         Encoding.UTF8.GetBytes(updated), null, DataProtectionScope.CurrentUser));
 
                     contents = JsonSerializer.Serialize(json);
+
+                    // verify the replacement actually landed before claiming success
+                    if (!contents.Contains(securityToken, StringComparison.Ordinal))
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, "Swap verification failed - cookie line was not replaced");
+                        return false;
+                    }
                 }
                 else
                 {
