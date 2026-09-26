@@ -77,6 +77,12 @@ namespace Onyxstrap.UI.Elements.Settings
 
         public void CloseWindow() => Close();
 
+        private void LaunchRobloxButton_Click(object sender, RoutedEventArgs e)
+        {
+            // hand off to a fresh launch process; the settings window stays open
+            System.Diagnostics.Process.Start(Paths.Process, "-player");
+        }
+
         #endregion INavigationWindow methods
 
         private void WpfUiWindow_Closing(object sender, CancelEventArgs e)
