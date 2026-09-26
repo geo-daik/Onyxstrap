@@ -48,6 +48,8 @@ namespace Onyxstrap
         {
             const string LOG_IDENT = "RobloxAuth::MintAuthenticationTicket";
 
+            string? csrfToken = null;
+
             for (int attempt = 0; attempt < 2; attempt++)
             {
                 try
@@ -56,13 +58,16 @@ namespace Onyxstrap
                     request.Headers.Add("Cookie", $".ROBLOSECURITY={securityToken}");
                     request.Headers.Add("Referer", "https://www.roblox.com/");
 
+                    // the first request gets CSRF-challenged; retry with the token it handed us
+                    if (csrfToken is not null)
+                        request.Headers.Add("X-CSRF-TOKEN", csrfToken);
+
                     using var response = await App.HttpClient.SendAsync(request);
 
                     if (response.StatusCode == HttpStatusCode.Forbidden && attempt == 0
                         && response.Headers.TryGetValues("x-csrf-token", out var csrfValues))
                     {
-                        // first request gets CSRF-challenged; retry with the token it handed us
-                        request.Headers.Add("X-CSRF-TOKEN", csrfValues.FirstOrDefault());
+                        csrfToken = csrfValues.FirstOrDefault();
                         continue;
                     }
 
