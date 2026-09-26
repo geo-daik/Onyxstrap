@@ -66,8 +66,16 @@ namespace Onyxstrap.UI.ViewModels.Settings
 
         public ICommand ManageCustomFontCommand => new RelayCommand(ManageCustomFont);
 
-        public IReadOnlyList<string> SystemFonts { get; } = System.Windows.Media.Fonts.SystemFontFamilies
-            .Select(f => f.Source)
+        // curated shortlist - clean fonts that read well in a game UI, memes included
+        private static readonly string[] CuratedFonts =
+        {
+            "Bahnschrift", "Calibri", "Cambria", "Candara", "Comic Sans MS", "Consolas",
+            "Constantia", "Corbel", "Franklin Gothic Medium", "Georgia", "Impact",
+            "Segoe UI", "Tahoma", "Trebuchet MS", "Verdana"
+        };
+
+        public IReadOnlyList<string> SystemFonts { get; } = CuratedFonts
+            .Where(f => System.Windows.Media.Fonts.SystemFontFamilies.Any(x => x.Source.Equals(f, StringComparison.OrdinalIgnoreCase)))
             .OrderBy(x => x)
             .ToList();
 

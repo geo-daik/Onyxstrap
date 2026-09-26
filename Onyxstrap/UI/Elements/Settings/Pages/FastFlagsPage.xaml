@@ -16,6 +16,42 @@
         <TextBlock Margin="0,0,0,16" Text="{x:Static resources:Strings.Menu_FastFlags_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
 
+        <ui:Card Margin="0,0,0,8" Padding="14,12">
+            <StackPanel>
+                <TextBlock FontSize="14" FontWeight="Medium" Text="Add a flag manually" />
+                <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" Margin="0,2,0,10"
+                           Text="Type a flag name and value - the name box suggests known flags as you type. Saved instantly to the active flag set." />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0" x:Name="ManualNameTextBox" Margin="0,0,8,0" FontFamily="Consolas"
+                             GotFocus="ManualName_GotFocus" TextChanged="ManualName_TextChanged"
+                             PreviewKeyDown="ManualName_PreviewKeyDown" />
+                    <TextBox Grid.Column="1" x:Name="ManualValueTextBox" Margin="0,0,8,0" FontFamily="Consolas" />
+                    <ui:Button Grid.Column="2" Content="Add flag" Appearance="Primary" Click="AddManualFlag_Click" />
+                </Grid>
+
+                <ListBox x:Name="ManualSuggestions" MaxHeight="148" Margin="0,6,0,0"
+                         Visibility="Collapsed" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         SelectionChanged="ManualSuggestion_Selected"
+                         PreviewMouseLeftButtonUp="ManualSuggestion_PreviewMouseLeftButtonUp">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="13" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock x:Name="ManualFeedback" Margin="4,8,0,0" FontSize="13"
+                           Foreground="{DynamicResource SystemAccentColorPrimaryBrush}" Visibility="Collapsed" />
+            </StackPanel>
+        </ui:Card>
+
         <controls:OptionControl
             Header="Onyx quick presets"
             Description="One-click flag bundles, applied to the active account's flag set. These set/remove only the flags listed on each button - everything else is left alone. Committed together with your other changes via Save.">

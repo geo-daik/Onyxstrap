@@ -50,6 +50,122 @@ namespace Onyxstrap.UI.Elements.Settings.Pages
             SetupViewModel();
         }
 
+        private bool _suppressManualSuggestions;
+
+        private void ManualName_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(ManualNameTextBox.Text))
+            {
+                ManualSuggestions.ItemsSource = FastFlagCatalog.Names.Take(12).ToList();
+                ManualSuggestions.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ManualName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (_suppressManualSuggestions)
+            {
+                _suppressManualSuggestions = false;
+                return;
+            }
+
+            var suggestions = FastFlagCatalog.Search(ManualNameTextBox.Text);
+
+            if (suggestions.Count == 0)
+            {
+                ManualSuggestions.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            ManualSuggestions.ItemsSource = suggestions;
+            ManualSuggestions.Visibility = Visibility.Visible;
+        }
+
+        private void ManualName_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (ManualSuggestions.Visibility != Visibility.Visible)
+                return;
+
+            switch (e.Key)
+            {
+                case System.Windows.Input.Key.Down:
+                    ManualSuggestions.SelectedIndex = Math.Min(ManualSuggestions.SelectedIndex + 1, ManualSuggestions.Items.Count - 1);
+                    ManualSuggestions.ScrollIntoView(ManualSuggestions.SelectedItem);
+                    e.Handled = true;
+                    break;
+
+                case System.Windows.Input.Key.Up:
+                    ManualSuggestions.SelectedIndex = Math.Max(ManualSuggestions.SelectedIndex - 1, 0);
+                    ManualSuggestions.ScrollIntoView(ManualSuggestions.SelectedItem);
+                    e.Handled = true;
+                    break;
+
+                case System.Windows.Input.Key.Enter:
+                case System.Windows.Input.Key.Tab:
+                    AcceptManualSuggestion();
+                    e.Handled = true;
+                    break;
+
+                case System.Windows.Input.Key.Escape:
+                    ManualSuggestions.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        private void ManualSuggestion_Selected(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (ManualSuggestions.SelectedItem is string name)
+            {
+                _suppressManualSuggestions = true;
+                ManualNameTextBox.Text = name;
+                ManualNameTextBox.CaretIndex = ManualNameTextBox.Text.Length;
+            }
+        }
+
+        private void ManualSuggestion_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (ManualSuggestions.SelectedItem is not null)
+                AcceptManualSuggestion();
+        }
+
+        private void AcceptManualSuggestion()
+        {
+            if (ManualSuggestions.SelectedItem is string name)
+            {
+                _suppressManualSuggestions = true;
+                ManualNameTextBox.Text = name;
+                ManualNameTextBox.CaretIndex = ManualNameTextBox.Text.Length;
+            }
+
+            ManualSuggestions.Visibility = Visibility.Collapsed;
+            ManualSuggestions.SelectedIndex = -1;
+            ManualValueTextBox.Focus();
+        }
+
+        private void AddManualFlag_Click(object sender, RoutedEventArgs e)
+        {
+            string name = ManualNameTextBox.Text.Trim();
+            string value = ManualValueTextBox.Text.Trim();
+
+            if (name.Length == 0 || value.Length == 0)
+            {
+                Frontend.ShowMessageBox("Type both a flag name and a value first.", MessageBoxImage.Warning);
+                return;
+            }
+
+            App.FastFlags.SetValue(name, value);
+            App.FastFlags.Save();
+
+            ManualFeedback.Text = $"Added {name} = {value}";
+            ManualFeedback.Visibility = Visibility.Visible;
+
+            ManualNameTextBox.Clear();
+            ManualValueTextBox.Clear();
+            ManualSuggestions.Visibility = Visibility.Collapsed;
+            ManualNameTextBox.Focus();
+        }
+
         private void ExportFlags_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*", FileName = "MyFastFlags.json" };
