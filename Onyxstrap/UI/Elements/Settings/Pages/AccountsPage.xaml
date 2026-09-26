@@ -7,6 +7,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:resources="clr-namespace:Onyxstrap.Resources"
       xmlns:controls="clr-namespace:Onyxstrap.UI.Elements.Controls"
+      xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
       mc:Ignorable="d"
       d:DesignHeight="900" d:DesignWidth="800"
       Title="AccountsPage"
@@ -56,7 +57,7 @@
                 <DataTemplate>
                     <ui:Card Margin="0,0,0,8" Padding="14,12" Loaded="AccountCard_Loaded">
                         <ui:Card.RenderTransform>
-                            <TranslateTransform Y="14" />
+                            <TranslateTransform Y="14" po:Freeze="False" />
                         </ui:Card.RenderTransform>
                         <Grid>
                             <Grid.ColumnDefinitions>

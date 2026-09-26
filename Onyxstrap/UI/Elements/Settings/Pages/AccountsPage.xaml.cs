@@ -59,8 +59,13 @@ namespace Onyxstrap.UI.Elements.Settings.Pages
                 index = Math.Max(0, entries.FindIndex(x => x.Id == entry.Id));
             }
 
-            if (card.RenderTransform is not TranslateTransform transform)
-                return;
+            // transforms declared in a DataTemplate arrive frozen; swap in a
+            // live unfrozen copy so the entrance animation can run
+            if (card.RenderTransform is not TranslateTransform transform || transform.IsFrozen)
+            {
+                transform = new TranslateTransform(0, 14);
+                card.RenderTransform = transform;
+            }
 
             transform.BeginAnimation(
                 TranslateTransform.YProperty,

@@ -6,6 +6,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:local="clr-namespace:Onyxstrap.UI.Elements.Dialogs"
         xmlns:base="clr-namespace:Onyxstrap.UI.Elements.Base"
+        xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
         xmlns:models="clr-namespace:Onyxstrap.UI.ViewModels"
         xmlns:resources="clr-namespace:Onyxstrap.Resources"
         mc:Ignorable="d"
@@ -43,7 +44,7 @@
         <Style BasedOn="{StaticResource {x:Type ui:CardAction}}" TargetType="ui:CardAction">
             <Setter Property="RenderTransform">
                 <Setter.Value>
-                    <TranslateTransform X="0" />
+                    <TranslateTransform X="0" po:Freeze="False" />
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
@@ -104,7 +105,7 @@
             <!-- light sweep -->
             <Rectangle Panel.ZIndex="1" IsHitTestVisible="False" Width="240" HorizontalAlignment="Left">
                 <Rectangle.RenderTransform>
-                    <TranslateTransform x:Name="SweepSlide" X="-300" />
+                    <TranslateTransform x:Name="SweepSlide" X="-300" po:Freeze="False" />
                 </Rectangle.RenderTransform>
                 <Rectangle.Fill>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
