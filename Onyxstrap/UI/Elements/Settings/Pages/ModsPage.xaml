@@ -97,6 +97,12 @@
         <controls:OptionControl 
             Header="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Title}">
             <StackPanel>
+                <ComboBox Width="220" Margin="0,0,8,0" IsEditable="True"
+                         ItemsSource="{Binding SystemFonts, Mode=OneTime}"
+                         Text="{Binding SelectedSystemFont, Mode=TwoWay}" />
+                <ui:Button Icon="Checkmark20" Content="Apply to Roblox" Appearance="Primary"
+                           Command="{Binding ApplySystemFontCommand}"
+                           Visibility="{Binding ApplySystemFontVisibility, Mode=OneWay}" />
                 <ui:Button Icon="DocumentAdd16" Content="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Choose}" Command="{Binding ManageCustomFontCommand}" Visibility="{Binding ChooseCustomFontVisibility, Mode=OneWay}" />
                 <ui:Button Icon="Delete16" Content="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Remove}" Appearance="Danger" Command="{Binding ManageCustomFontCommand}" Visibility="{Binding DeleteCustomFontVisibility, Mode=OneWay}" />
             </StackPanel>

@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Input;
 
 using Microsoft.Win32;
@@ -64,6 +65,62 @@ namespace Onyxstrap.UI.ViewModels.Settings
         public Visibility DeleteCustomFontVisibility => !String.IsNullOrEmpty(TextFontTask.NewState) ? Visibility.Visible : Visibility.Collapsed;
 
         public ICommand ManageCustomFontCommand => new RelayCommand(ManageCustomFont);
+
+        public IReadOnlyList<string> SystemFonts { get; } = System.Windows.Media.Fonts.SystemFontFamilies
+            .Select(f => f.Source)
+            .OrderBy(x => x)
+            .ToList();
+
+        private string? _selectedSystemFont;
+
+        public string? SelectedSystemFont
+        {
+            get => _selectedSystemFont;
+            set
+            {
+                _selectedSystemFont = value;
+                OnPropertyChanged(nameof(SelectedSystemFont));
+                OnPropertyChanged(nameof(ApplySystemFontVisibility));
+            }
+        }
+
+        public Visibility ApplySystemFontVisibility => !String.IsNullOrEmpty(_selectedSystemFont) ? Visibility.Visible : Visibility.Collapsed;
+
+        public ICommand ApplySystemFontCommand => new RelayCommand(ApplySystemFont);
+
+        private void ApplySystemFont()
+        {
+            if (String.IsNullOrEmpty(_selectedSystemFont))
+                return;
+
+            var family = new System.Windows.Media.FontFamily(_selectedSystemFont);
+
+            if ((family.GetTypefaces().FirstOrDefault() ?? new System.Windows.Media.Typeface(family.Source)).TryGetGlyphTypeface(out var glyph) == false)
+            {
+                Frontend.ShowMessageBox(Strings.Menu_Mods_Misc_CustomFont_Invalid, MessageBoxImage.Error);
+                return;
+            }
+
+            string fontPath = glyph.FontUri.IsFile ? glyph.FontUri.LocalPath : "";
+
+            if (!File.Exists(fontPath))
+            {
+                Frontend.ShowMessageBox(Strings.Menu_Mods_Misc_CustomFont_Invalid, MessageBoxImage.Error);
+                return;
+            }
+
+            if (File.Exists(Paths.CustomFont))
+                Filesystem.AssertReadOnly(Paths.CustomFont);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(Paths.CustomFont)!);
+            File.Copy(fontPath, Paths.CustomFont, true);
+
+            // keep the mod task's state in sync with the file we just placed
+            TextFontTask.NewState = Paths.CustomFont;
+            TextFontTask.Execute();
+
+            Frontend.ShowMessageBox($"'{_selectedSystemFont}' will be used in Roblox from the next launch.", MessageBoxImage.Information);
+        }
 
         public ICommand OpenCompatSettingsCommand => new RelayCommand(OpenCompatSettings);
 

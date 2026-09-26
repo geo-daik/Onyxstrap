@@ -369,14 +369,7 @@ namespace Onyxstrap.UI.Elements.Settings.Pages
 
             try
             {
-                var imported = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(dialog.FileName));
-
-                if (imported is null)
-                    throw new InvalidDataException("File contained no JSON object");
-
-                foreach (var pair in imported)
-                    App.FastFlags.SetValue(pair.Key, pair.Value);
-
+                FastFlagBackup.Import(dialog.FileName);
                 ReloadList();
             }
             catch (Exception ex)
@@ -398,7 +391,7 @@ namespace Onyxstrap.UI.Elements.Settings.Pages
 
             try
             {
-                File.WriteAllText(dialog.FileName, System.Text.Json.JsonSerializer.Serialize(App.FastFlags.Prop, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                FastFlagBackup.Export(dialog.FileName);
                 Frontend.ShowMessageBox($"Flags exported to {dialog.FileName}", MessageBoxImage.Information);
             }
             catch (Exception ex)

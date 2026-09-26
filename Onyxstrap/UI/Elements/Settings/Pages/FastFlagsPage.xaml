@@ -84,6 +84,15 @@
         </controls:OptionControl>
 
         <controls:OptionControl
+            Header="Back up and share flags"
+            Description="Export your whole flag set to a JSON file to share or back it up, or import a set from a file. Imported flags are saved immediately.">
+            <StackPanel Orientation="Horizontal">
+                <ui:Button Margin="2" Content="Export flags to file..." Click="ExportFlags_Click" />
+                <ui:Button Margin="6,2,2,2" Content="Import flags from file..." Click="ImportFlags_Click" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <controls:OptionControl
             Header="Game presets"
             Description="Flag bundles tuned for a game genre - frame pacing, detail level and latency trade-offs. Applied to the active account's flag set, committed with Save.">
             <StackPanel Orientation="Horizontal">
