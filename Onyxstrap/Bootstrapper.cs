@@ -560,24 +560,6 @@ namespace Onyxstrap
 
             SetStatus(Strings.Bootstrapper_Status_Starting);
 
-            // account switcher: with an active account, fully switch the
-            // client's stored session (cookie store + app identity) so every
-            // launch (bare or from the website) boots logged in as that account
-            if (_launchMode == LaunchMode.Player && App.Accounts.ActiveAccount is OnyxAccount activeAccount)
-            {
-                string? accountToken = App.Accounts.GetToken(activeAccount);
-
-                if (!String.IsNullOrEmpty(accountToken))
-                    RobloxCookieStore.ApplyAccountSession(activeAccount, accountToken);
-                else
-                    App.Logger.WriteLine(LOG_IDENT, "Active account has no usable token, launching without account switch");
-
-                // website launches also get a one-time ticket rebuilt into the
-                // launch URI, matching the account
-                if (!String.IsNullOrEmpty(_launchCommandLine) && !String.IsNullOrEmpty(accountToken))
-                    _launchCommandLine = await RobloxAuth.BuildAccountLaunchArgs(_launchCommandLine, accountToken);
-            }
-
             var startInfo = new ProcessStartInfo()
             {
                 FileName = AppData.ExecutablePath,

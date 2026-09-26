@@ -136,9 +136,6 @@ namespace Onyxstrap
 
             base.Save();
 
-            // keep the active account's own flag set in sync with flag edits
-            App.Accounts.SyncActiveFlags();
-
             // clone the dictionary
             OriginalProp = new(Prop);
         }

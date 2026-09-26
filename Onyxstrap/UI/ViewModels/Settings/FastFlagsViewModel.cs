@@ -219,10 +219,6 @@ namespace Onyxstrap.UI.ViewModels.Settings
 
         public Visibility CanShowFastFlagEditor => App.IsStudioInstalled ? Visibility.Visible : Visibility.Collapsed;
 
-        // flags follow the active account - make that visible in the editor
-        public bool HasAccounts => App.Accounts.HasAccounts;
-
-        public string ActiveAccountName => App.Accounts.ActiveAccount?.Name ?? "";
 
         public bool UseFastFlagManager
         {

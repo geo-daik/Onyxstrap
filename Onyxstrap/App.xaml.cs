@@ -62,7 +62,6 @@ namespace Onyxstrap
 
         public static readonly FastFlagManager FastFlags = new();
 
-        public static readonly AccountManager Accounts = new();
 
         public static readonly HttpClient HttpClient = new(
             new HttpClientLoggingHandler(
@@ -378,7 +377,6 @@ namespace Onyxstrap
                 Settings.Load();
                 State.Load();
                 FastFlags.Load();
-                Accounts.Load();
 
                 if (!Locale.SupportedLocales.ContainsKey(Settings.Prop.Locale))
                 {

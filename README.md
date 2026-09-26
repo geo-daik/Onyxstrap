@@ -3,9 +3,9 @@
     <img src="Images/Onyxstrap-full-light.png#gh-light-mode-only" width="440">
 </p>
 
-> An alternative bootstrapper for Roblox with a built-in account manager, forked from [Bloxstrap](https://github.com/bloxstraplabs/bloxstrap).
+> An alternative bootstrapper for Roblox, forked from [Bloxstrap](https://github.com/bloxstraplabs/bloxstrap).
 
-Onyxstrap is a free, open-source launcher for Roblox on Windows 10+. It does everything Bloxstrap does, and adds its own account management features on top.
+Onyxstrap is a free, open-source launcher for Roblox on Windows 10+. It does everything Bloxstrap does - with its own look, feel and quality-of-life features on top.
 
 ## Download
 
@@ -21,9 +21,12 @@ Everything from Bloxstrap:
 
 Plus Onyxstrap's own:
 
-- **Account Manager** - save your Roblox accounts inside Onyxstrap and launch straight into the one you pick. Each account gets its **own FastFlag set** (your flag edits follow the active account), and named **presets** (e.g. "Max FPS", "Vanilla") can be saved once and applied to any account.
-  - Switching accounts happens at launch: Onyxstrap mints a one-time authentication ticket from the account's session token and hands it to the Roblox client - the same mechanism the Roblox website uses. Nothing is injected into the client process.
+- **Onyx identity** - animated cutscene bootstrapper, branded installer and launch menu, and the gem icon on the Roblox window while playing
+- **Onyx loading screen** - a built-in mod that replaces the Roblox loading screen with a deep onyx one
+- **Quick + game presets** - one-click FastFlag bundles, rebuilt on long-proven flags only
 - **Privacy-first defaults** - no analytics.
+
+> The Account Manager (saved accounts / one-click switching) is temporarily removed while its session-switching mechanism is reworked. It will return in a future release.
 
 ## How accounts are stored
 
