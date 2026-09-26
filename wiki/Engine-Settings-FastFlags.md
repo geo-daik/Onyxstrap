@@ -29,15 +29,21 @@ Presets are committed together with your other flag edits via the Save button, a
 Under the quick presets there's a **Game presets** selector - flag bundles tuned for a game *genre*, since engine flags are global and what differs is the right trade-off per game type:
 
 - **Simulators** (Blox Fruits, Pet Sim) - uncapped FPS, everything low; grinding games are particle/UI heavy
-- **Shooters** (Arsenal, Phantom Forces) - uncapped FPS, low detail, D3D11 for stable frame pacing, shadows and post-FX off
+- **Shooters** (Arsenal, Phantom Forces) - uncapped FPS, low detail
 - **Obby / Parkour** - frame consistency over eye candy
 - **Roleplay** (Brookhaven, Adopt Me) - 120 FPS, keep it pretty
 - **Story / Horror** (Doors) - quality and atmosphere, modest 120 target
-- **Competitive** - solid 240 target, low detail, D3D11
+- **Competitive** - solid 240 target, low detail
+
+Every bundle uses only the long-proven flags (FPS cap pair, texture quality, MSAA) - no speculative flags that get stripped by Roblox's allowlist or stutter on some GPUs.
 
 Pick one, hit **Apply** - it lands in the active account's flag set like everything else. **Reset all presets** clears every flag any preset can set.
 
 A note on honesty: the FPS-cap and quality flags are the long-standing workhorses; shadow intensity, post-FX and the D3D11 preference depend on what Roblox's allowlist permits at any given time - hover tooltips tell you exactly what gets set, and if a flag is ignored it simply does nothing.
+
+## Flag autocomplete
+
+In the flag editor, click into the **Name** field of the Add Flag dialog and a list of known flags pops up - type to filter (prefix matches first), click an entry or press Enter/Tab to complete it. The catalog ships with 376 known flag names and refreshes daily from Roblox's own settings endpoint (cached to `FlagCatalog.json` in the install folder; the embedded list always works offline).
 
 ## Per-account flag sets
 
