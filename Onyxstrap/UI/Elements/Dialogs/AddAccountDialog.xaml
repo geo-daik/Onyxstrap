@@ -46,18 +46,29 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" MinWidth="110" Text="{x:Static resources:Strings.Dialog_AddAccount_NameLabel}" Margin="0,0,12,12" />
-            <TextBox Grid.Row="0" Grid.Column="1" Name="AccountNameTextBox" Margin="0,0,0,12" />
+            <ui:Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                       Appearance="Primary" Icon="Globe24" Content="Log in with Roblox (recommended)"
+                       Click="LoginButton_Click" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="{x:Static resources:Strings.Dialog_AddAccount_TokenLabel}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,0,0,12" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,10,0,12"
+                       Text="...or paste a session token manually:" />
 
-            <PasswordBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Name="AccountTokenTextBox" />
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" MinWidth="110" Text="{x:Static resources:Strings.Dialog_AddAccount_NameLabel}" Margin="0,0,12,12" />
+            <TextBox Grid.Row="2" Grid.Column="1" Name="AccountNameTextBox" Margin="0,0,0,12" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="{x:Static resources:Strings.Dialog_AddAccount_TokenLabel}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,0,0,12" />
+
+            <PasswordBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Name="AccountTokenTextBox" />
         </Grid>
 
         <Border Grid.Row="2" Margin="0,10,0,0" Padding="15" Background="{ui:ThemeResource SolidBackgroundFillColorSecondaryBrush}">

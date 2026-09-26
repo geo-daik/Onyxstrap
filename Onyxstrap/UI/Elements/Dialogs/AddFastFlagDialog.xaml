@@ -36,6 +36,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -43,10 +44,23 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" MinWidth="100" Text="{x:Static resources:Strings.Common_Name}" Margin="0,0,0,12" />
-                    <TextBox Grid.Row="0" Grid.Column="1" Name="FlagNameTextBox" Margin="0,0,0,12" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Name="FlagNameTextBox" Margin="0,0,0,12"
+                             TextChanged="FlagNameTextBox_TextChanged" PreviewKeyDown="FlagNameTextBox_PreviewKeyDown"
+                             GotFocus="FlagNameTextBox_GotFocus" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" MinWidth="100" Text="{x:Static resources:Strings.Common_Value}" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Name="FlagValueTextBox" />
+                    <ListBox Grid.Row="1" Grid.Column="1" x:Name="SuggestionsList" Margin="0,0,0,12" MaxHeight="148"
+                             Visibility="Collapsed" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             SelectionChanged="SuggestionsList_SelectionChanged"
+                             PreviewMouseLeftButtonUp="SuggestionsList_PreviewMouseLeftButtonUp">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="13" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" MinWidth="100" Text="{x:Static resources:Strings.Common_Value}" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Name="FlagValueTextBox" />
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static resources:Strings.Common_ImportJson}">

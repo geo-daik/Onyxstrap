@@ -35,6 +35,29 @@ namespace Onyxstrap.UI.Elements.Dialogs
             OKButton.IsEnabled = !String.IsNullOrWhiteSpace(AccountNameTextBox.Text) && !String.IsNullOrWhiteSpace(AccountTokenTextBox.Password);
         }
 
+        /// <summary>
+        /// Opens the embedded Roblox login page; the session token is captured
+        /// automatically after a successful one-time login.
+        /// </summary>
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            Cursor = Cursors.Wait;
+
+            var loginWindow = new WebView2LoginWindow();
+            loginWindow.ShowDialog();
+
+            Cursor = Cursors.Arrow;
+
+            if (loginWindow.Result != MessageBoxResult.OK || String.IsNullOrWhiteSpace(loginWindow.SecurityToken))
+                return;
+
+            AccountTokenTextBox.Password = loginWindow.SecurityToken;
+
+            // complete the flow immediately - no need to touch the form
+            if (String.IsNullOrWhiteSpace(AccountName))
+                OKButton_Click(sender, e);
+        }
+
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
             Cursor = Cursors.Wait;

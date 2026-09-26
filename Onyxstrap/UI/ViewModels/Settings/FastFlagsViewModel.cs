@@ -123,9 +123,9 @@ namespace Onyxstrap.UI.ViewModels.Settings
             LastActionMessage = message;
         }
 
-        // Game presets: flag bundles tuned per game genre. The engine flags are
-        // global, so "for a game" means the mix that plays best in that genre -
-        // FPS headroom, render quality, and latency trade-offs.
+        // Game presets: flag bundles tuned per game genre, built ONLY on the
+        // long-proven flags (FPS cap pair, texture quality, MSAA) so every flag
+        // in every bundle is one the community has verified working for years.
         public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GamePresets = new Dictionary<string, IReadOnlyDictionary<string, string>>
         {
             ["Simulators (Blox Fruits, Pet Sim)"] = new Dictionary<string, string>
@@ -135,21 +135,16 @@ namespace Onyxstrap.UI.ViewModels.Settings
                 ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
                 ["DFFlagTextureQualityOverrideEnabled"] = "True",
                 ["DFIntTextureQualityOverride"] = "0",
-                ["FIntDebugForceMSAASamples"] = "1",
-                ["FIntRenderShadowIntensity"] = "0",
-                ["FFlagDisablePostFx"] = "True"
+                ["FIntDebugForceMSAASamples"] = "1"
             },
             ["Shooters (Arsenal, Phantom Forces)"] = new Dictionary<string, string>
             {
-                // latency first: uncapped FPS, low detail, D3D11 for the most stable frame pacing
+                // latency first: uncapped FPS, low detail
                 ["DFIntTaskSchedulerTargetFps"] = "999",
                 ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
                 ["DFFlagTextureQualityOverrideEnabled"] = "True",
                 ["DFIntTextureQualityOverride"] = "1",
-                ["FIntDebugForceMSAASamples"] = "1",
-                ["FIntRenderShadowIntensity"] = "0",
-                ["FFlagDisablePostFx"] = "True",
-                ["FFlagDebugGraphicsPreferD3D11"] = "True"
+                ["FIntDebugForceMSAASamples"] = "1"
             },
             ["Obby / Parkour"] = new Dictionary<string, string>
             {
@@ -158,8 +153,7 @@ namespace Onyxstrap.UI.ViewModels.Settings
                 ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
                 ["DFFlagTextureQualityOverrideEnabled"] = "True",
                 ["DFIntTextureQualityOverride"] = "1",
-                ["FIntDebugForceMSAASamples"] = "1",
-                ["FFlagDisablePostFx"] = "True"
+                ["FIntDebugForceMSAASamples"] = "1"
             },
             ["Roleplay (Brookhaven, Adopt Me)"] = new Dictionary<string, string>
             {
@@ -181,15 +175,12 @@ namespace Onyxstrap.UI.ViewModels.Settings
             },
             ["Competitive (ranked, tournament)"] = new Dictionary<string, string>
             {
-                // same as shooters but rock-solid 240 target for high-refresh monitors
+                // rock-solid 240 target for high-refresh monitors, low detail
                 ["DFIntTaskSchedulerTargetFps"] = "240",
                 ["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
                 ["DFFlagTextureQualityOverrideEnabled"] = "True",
                 ["DFIntTextureQualityOverride"] = "1",
-                ["FIntDebugForceMSAASamples"] = "1",
-                ["FIntRenderShadowIntensity"] = "0",
-                ["FFlagDisablePostFx"] = "True",
-                ["FFlagDebugGraphicsPreferD3D11"] = "True"
+                ["FIntDebugForceMSAASamples"] = "1"
             }
         };
 

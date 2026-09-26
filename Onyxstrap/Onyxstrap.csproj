@@ -13,6 +13,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TieredPgo>True</TieredPgo>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
     
   <ItemGroup>
@@ -56,6 +57,7 @@
     <EmbeddedResource Include="Resources\Onyx\loadingCircle.png" />
     <EmbeddedResource Include="Resources\Onyx\DarkThemeLoadingCircle.png" />
     <EmbeddedResource Include="Resources\Onyx\LightThemeLoadingCircle.png" />
+    <EmbeddedResource Include="Resources\FFlagNames.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,6 +72,7 @@
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     <PackageReference Include="XamlAnimatedGif" Version="2.3.0" />
   </ItemGroup>

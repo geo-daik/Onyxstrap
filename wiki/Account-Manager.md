@@ -4,11 +4,23 @@ Onyxstrap's account manager lets you save your Roblox accounts and launch straig
 
 ## Adding an account
 
+**The easy way — one-time login (recommended):**
+
 1. Open **Onyxstrap → Settings → Accounts → Add account**.
-2. Log into [roblox.com](https://www.roblox.com) in your browser (with 2FA if you use it).
-3. Open your browser's developer tools (**F12**) → **Application** (Edge/Chrome) or **Storage** (Firefox) → **Cookies** → `https://www.roblox.com`.
-4. Copy the value of the **`.ROBLOSECURITY`** cookie — it's a long `|`-separated string.
-5. Paste it into Onyxstrap and click **Add**.
+2. Click **Log in with Roblox**. An embedded browser opens on the official roblox.com login page.
+3. Log in once — password, 2FA and CAPTCHA are all handled by Roblox's own page.
+4. Onyxstrap detects the finished login automatically, verifies the session and saves the account. Done.
+
+The embedded browser uses a throwaway profile that is wiped after each login: your password is never seen or stored by Onyxstrap, and no plaintext session data is left behind.
+
+**The manual way — paste a token:**
+
+If the embedded browser isn't available (WebView2 runtime missing) or you prefer not to log in inside Onyxstrap:
+
+1. Log into [roblox.com](https://www.roblox.com) in your own browser (with 2FA if you use it).
+2. Open your browser's developer tools (**F12**) → **Application** (Edge/Chrome) or **Storage** (Firefox) → **Cookies** → `https://www.roblox.com`.
+3. Copy the value of the **`.ROBLOSECURITY`** cookie — it's a long `|`-separated string.
+4. Paste it into Onyxstrap and click **Add**.
 
 Onyxstrap verifies the token with roblox.com, auto-fills the account's display name, user ID and avatar, and stores it. The current FastFlag set is copied as the new account's own starting set.
 
