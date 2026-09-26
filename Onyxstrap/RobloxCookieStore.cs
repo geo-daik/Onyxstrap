@@ -75,6 +75,50 @@ namespace Onyxstrap
             }
         }
 
+        /// <summary>
+        /// Fully switches the client's stored session to the given account:
+        /// the .ROBLOSECURITY cookie in RobloxCookies.dat plus the identity
+        /// (UserId/Username/DisplayName) in LocalStorage\appStorage.json,
+        /// which is what the app shell actually reads on boot.
+        /// </summary>
+        public static bool ApplyAccountSession(OnyxAccount account, string securityToken)
+        {
+            const string LOG_IDENT = "RobloxCookieStore::ApplyAccountSession";
+
+            bool cookieSwapped = SwapSecurityCookie(securityToken);
+
+            try
+            {
+                string storagePath = Path.Combine(Paths.LocalAppData, "Roblox", "LocalStorage", "appStorage.json");
+
+                if (!File.Exists(storagePath))
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "appStorage.json does not exist yet, skipping identity update");
+                    return cookieSwapped;
+                }
+
+                var storage = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllText(storagePath));
+
+                if (storage is null)
+                    return cookieSwapped;
+
+                storage["UserId"] = JsonSerializer.SerializeToElement(account.UserId);
+                storage["Username"] = JsonSerializer.SerializeToElement(account.Name);
+                storage["DisplayName"] = JsonSerializer.SerializeToElement(account.Name);
+
+                File.WriteAllText(storagePath, JsonSerializer.Serialize(storage));
+
+                App.Logger.WriteLine(LOG_IDENT, $"Updated appStorage identity to {account.Name} ({account.UserId})");
+
+                return cookieSwapped;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Failed to update appStorage identity: {ex.Message}");
+                return cookieSwapped;
+            }
+        }
+
         private class RobloxCookieFile
         {
             [JsonPropertyName("CookiesVersion")]

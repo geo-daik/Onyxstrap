@@ -31,7 +31,7 @@ Onyxstrap verifies the token with roblox.com, auto-fills the account's display n
 - Open the **Accounts** page and use **Launch** next to an account, or
 - Set an account **Active** — every subsequent launch (including website launches) boots into it.
 
-Switching takes effect on the next Roblox launch: Onyxstrap mints a one-time **authentication ticket** from that account's session token and hands it to the Roblox client — the same mechanism the Roblox website uses when you press Play. Nothing is injected into the client.
+Switching takes effect on the next Roblox launch. Onyxstrap updates the **client's own cookie store** (the DPAPI-protected `RobloxCookies.dat` the client maintains in your user profile) so the client boots logged in as the picked account; for website-launched games it additionally mints a one-time **authentication ticket** into the launch URI — the same mechanism the Roblox website uses when you press Play. Nothing is injected into the client.
 
 > **Why not switch while the game is running?** That would require injecting into the Roblox process, which its anti-cheat (Byfron/Hyperion) actively detects and punishes. Onyxstrap switches between sessions instead — it's one click and a few seconds.
 
