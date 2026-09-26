@@ -177,33 +177,45 @@
                     <TextBlock Grid.Row="0" TextAlignment="Center" Text="{Binding Message}" FontFamily="{StaticResource Rubik}"
                                FontSize="15" FontWeight="Light" Foreground="#CCE8E6F2" Margin="0,0,0,18" />
 
-                    <Grid Grid.Row="1" Height="6">
-                        <ProgressBar Height="6" BorderThickness="0"
-                                     Foreground="#FF8A80DC" Background="#14FFFFFF"
-                                     IsIndeterminate="{Binding ProgressIndeterminate}"
-                                     Maximum="{Binding ProgressMaximum, Mode=OneWay}" Value="{Binding ProgressValue}">
-                            <ProgressBar.Template>
-                                <ControlTemplate TargetType="ProgressBar">
-                                    <Border x:Name="PART_Track" CornerRadius="3" Background="{TemplateBinding Background}">
-                                        <Border x:Name="PART_Indicator" CornerRadius="3" HorizontalAlignment="Left" Background="{TemplateBinding Foreground}" />
-                                    </Border>
-                                </ControlTemplate>
-                            </ProgressBar.Template>
-                        </ProgressBar>
-                        <Grid ClipToBounds="True">
-                            <Rectangle Width="54" RadiusX="3" RadiusY="3" Opacity="0.35" HorizontalAlignment="Left">
-                                <Rectangle.RenderTransform>
-                                    <TranslateTransform x:Name="ShimmerSlide" X="-60" />
-                                </Rectangle.RenderTransform>
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#00FFFFFF" Offset="0" />
-                                        <GradientStop Color="#FFFFFFFF" Offset="0.5" />
-                                        <GradientStop Color="#00FFFFFF" Offset="1" />
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                            </Rectangle>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Height="6">
+                            <ProgressBar x:Name="ProgressBar1" Height="6" BorderThickness="0"
+                                         Foreground="#FF8A80DC" Background="#14FFFFFF"
+                                         IsIndeterminate="{Binding ProgressIndeterminate}"
+                                         Maximum="{Binding ProgressMaximum, Mode=OneWay}" Value="{Binding ProgressValue}">
+                                <ProgressBar.Template>
+                                    <ControlTemplate TargetType="ProgressBar">
+                                        <Border x:Name="PART_Track" CornerRadius="3" Background="{TemplateBinding Background}">
+                                            <Border x:Name="PART_Indicator" CornerRadius="3" HorizontalAlignment="Left" Background="{TemplateBinding Foreground}" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </ProgressBar.Template>
+                            </ProgressBar>
+                            <Grid ClipToBounds="True">
+                                <Rectangle Width="54" RadiusX="3" RadiusY="3" Opacity="0.35" HorizontalAlignment="Left">
+                                    <Rectangle.RenderTransform>
+                                        <TranslateTransform x:Name="ShimmerSlide" X="-60" />
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#00FFFFFF" Offset="0" />
+                                            <GradientStop Color="#FFFFFFFF" Offset="0.5" />
+                                            <GradientStop Color="#00FFFFFF" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Grid>
                         </Grid>
+
+                        <TextBlock Grid.Column="1" Margin="10,0,0,3" VerticalAlignment="Center"
+                                   FontFamily="{StaticResource Rubik}" FontSize="12" Foreground="#99B9AFFF"
+                                   Text="{Binding PercentText, Mode=OneWay}"
+                                   Visibility="{Binding PercentTextVisibility, Mode=OneWay}" />
                     </Grid>
                 </Grid>
 

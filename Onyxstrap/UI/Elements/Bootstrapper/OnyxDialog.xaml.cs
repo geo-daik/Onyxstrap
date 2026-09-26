@@ -71,6 +71,9 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
                 if (ProgressMaximum > 0)
                 {
                     double ratio = Math.Clamp(ProgressValue / (double)ProgressMaximum, 0, 1);
+
+                    _viewModel.PercentText = $"{ratio:P0}";
+
                     SafeOnUi(() =>
                     {
                         Halo.Opacity = 0.55 + 0.45 * ratio;
@@ -125,7 +128,36 @@ namespace Onyxstrap.UI.Elements.Bootstrapper
 
             InitializeComponent();
 
+            ApplyAccent();
             Loaded += (_, _) => SpawnParticles();
+        }
+
+        /// <summary>
+        /// Tints the cutscene's glow, halo, progress and wordmark to the
+        /// user's selected accent palette.
+        /// </summary>
+        private void ApplyAccent()
+        {
+            try
+            {
+                var accent = App.Settings.Prop.AccentTheme.GetColor();
+                var light = ColorEx.Lerp(accent, System.Windows.Media.Colors.White, 0.45);
+                var dim = Color.FromArgb(0x26, accent.R, accent.G, accent.B);
+
+                GemGlow.Color = accent;
+                Halo.Stroke = new SolidColorBrush(Color.FromArgb(0x4D, accent.R, accent.G, accent.B));
+                RootBorder.BorderBrush = new SolidColorBrush(dim);
+                ProgressBar1.Foreground = new SolidColorBrush(accent);
+                Wordmark.Foreground = new SolidColorBrush(light);
+                Tagline.Foreground = new SolidColorBrush(Color.FromArgb(0x99, light.R, light.G, light.B));
+
+                if (SuccessFlash.Fill is RadialGradientBrush flashBrush)
+                    flashBrush.GradientStops[0].Color = Color.FromArgb(0x66, light.R, light.G, light.B);
+            }
+            catch
+            {
+                // theming is cosmetic - keep the defaults on any failure
+            }
         }
 
         /// <summary>

@@ -13,7 +13,24 @@
       d:DesignHeight="800" d:DesignWidth="800"
       Title="ModsPage"
       Scrollable="True">
-    <StackPanel Margin="0,0,14,14">
+
+    <ui:UiPage.Resources>
+        <QuadraticEase x:Key="PageEase" EasingMode="EaseInOut" />
+    </ui:UiPage.Resources>
+    <ui:UiPage.Triggers>
+        <EventTrigger RoutedEvent="Page.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="PageContent" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.28" />
+                    <DoubleAnimation Storyboard.TargetName="PageSlide" Storyboard.TargetProperty="Y" From="14" To="0" Duration="0:0:0.32" EasingFunction="{StaticResource PageEase}" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </ui:UiPage.Triggers>
+        <StackPanel x:Name="PageContent" Margin="0,0,14,14">
+            <StackPanel.RenderTransform>
+                <TranslateTransform x:Name="PageSlide" Y="0" />
+            </StackPanel.RenderTransform>
         <TextBlock Text="{x:Static resources:Strings.Menu_Mods_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <Grid Margin="0,16,0,0">
@@ -65,7 +82,18 @@
         <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_Mods_OnyxLoadingScreen_Title}"
             Description="{x:Static resources:Strings.Menu_Mods_OnyxLoadingScreen_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding OnyxLoadingScreenTask.NewState, Mode=TwoWay}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Width="64" Height="64" CornerRadius="8"
+                        BorderBrush="{DynamicResource SystemAccentColorPrimaryBrush}" BorderThickness="1">
+                    <Image Source="pack://application:,,,/Resources/Onyx/LoadingPreview.png" RenderOptions.BitmapScalingMode="HighQuality" />
+                </Border>
+                <ui:ToggleSwitch Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center"
+                                 IsChecked="{Binding OnyxLoadingScreenTask.NewState, Mode=TwoWay}" />
+            </Grid>
         </controls:OptionControl>
 
         <controls:OptionControl 

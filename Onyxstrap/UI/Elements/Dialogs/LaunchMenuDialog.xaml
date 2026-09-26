@@ -147,13 +147,13 @@
                     </Image>
                     <TextBlock Margin="0,14,0,0" Text="O N Y X S T R A P" FontFamily="{StaticResource Rubik}" FontSize="19" FontWeight="SemiBold">
                         <TextBlock.Foreground>
-                            <LinearGradientBrush>
+                            <LinearGradientBrush x:Name="WordmarkForeground">
                                 <GradientStop Color="#FFE8E6F2" Offset="0" />
                                 <GradientStop Color="#FFB9AFFF" Offset="1" />
                             </LinearGradientBrush>
                         </TextBlock.Foreground>
                     </TextBlock>
-                    <TextBlock Margin="0,2,0,0" FontFamily="{StaticResource Rubik}" FontSize="12" Foreground="#99B9AFFF" Text="forged for Roblox" />
+                    <TextBlock x:Name="TaglineText" Margin="0,2,0,0" FontFamily="{StaticResource Rubik}" FontSize="12" Foreground="#99B9AFFF" Text="forged for Roblox" />
                     <TextBlock Margin="0,14,0,0" FontFamily="{StaticResource Rubik}" FontSize="12" Foreground="#77E8E6F2" Text="{Binding Version, Mode=OneTime}" />
 
                     <StackPanel Orientation="Horizontal" Margin="0,18,0,0">

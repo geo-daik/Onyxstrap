@@ -36,6 +36,21 @@ namespace Onyxstrap.UI.Elements.Dialogs
             DataContext = viewModel;
 
             InitializeComponent();
+
+            try
+            {
+                var accent = App.Settings.Prop.AccentTheme.GetColor();
+                var light = accent.Lerp(Colors.White, 0.45);
+
+                GemGlow.Color = accent;
+                WordmarkForeground.GradientStops[0].Color = Color.FromArgb(0xFF, light.R, light.G, light.B);
+                WordmarkForeground.GradientStops[1].Color = Color.FromArgb(0xFF, light.R, light.G, light.B);
+                TaglineText.Foreground = new SolidColorBrush(Color.FromArgb(0x99, light.R, light.G, light.B));
+            }
+            catch
+            {
+                // cosmetic only
+            }
         }
     }
 }
