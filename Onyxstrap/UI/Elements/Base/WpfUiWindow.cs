@@ -24,9 +24,9 @@ namespace Onyxstrap.UI.Elements.Base
 
             _themeService.SetTheme(themeType);
 
-            // Onyx violet accent - the app keeps its own identity instead of
-            // following the Windows system accent color
-            Accent.Apply(System.Windows.Media.Color.FromRgb(0x7C, 0x6F, 0xD8), themeType, false);
+            // the app keeps its own accent identity instead of following the
+            // Windows system accent color; the palette is user-selectable
+            Accent.Apply(App.Settings.Prop.AccentTheme.GetColor(), themeType, false);
 
             // there doesn't seem to be a way to query the name for merged dictionaries
             var dict = new ResourceDictionary { Source = new Uri($"pack://application:,,,/UI/Style/{Enum.GetName(App.Settings.Prop.Theme.GetFinal())}.xaml") };

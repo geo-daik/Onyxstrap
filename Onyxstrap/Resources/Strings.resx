@@ -1446,6 +1446,12 @@ Defaulting to {1}.</value>
   <data name="Dialog.RemoveAccount.Title" xml:space="preserve">
     <value>Remove account</value>
   </data>
+  <data name="Menu.Appearance.Accent.Title" xml:space="preserve">
+    <value>Accent color</value>
+  </data>
+  <data name="Menu.Appearance.Accent.Description" xml:space="preserve">
+    <value>Pick the accent used across the app - buttons, highlights and toggles.</value>
+  </data>
   <data name="Menu.Mods.OnyxLoadingScreen.Title" xml:space="preserve">
     <value>Onyx loading screen</value>
   </data>

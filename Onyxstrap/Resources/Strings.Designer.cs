@@ -3801,6 +3801,24 @@ namespace Onyxstrap.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Accent color.
+        /// </summary>
+        public static string Menu_Appearance_Accent_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.Accent.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Pick the accent used across the app - buttons, highlights and toggles..
+        /// </summary>
+        public static string Menu_Appearance_Accent_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.Accent.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Onyx loading screen.
         /// </summary>
         public static string Menu_Mods_OnyxLoadingScreen_Title {

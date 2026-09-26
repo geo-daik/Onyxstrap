@@ -357,6 +357,56 @@ namespace Onyxstrap.UI.Elements.Settings.Pages
             }
         }
 
+        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = $"JSON files (*.json)|*.json|All files (*.*)|*.*"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                var imported = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(dialog.FileName));
+
+                if (imported is null)
+                    throw new InvalidDataException("File contained no JSON object");
+
+                foreach (var pair in imported)
+                    App.FastFlags.SetValue(pair.Key, pair.Value);
+
+                ReloadList();
+            }
+            catch (Exception ex)
+            {
+                Frontend.ShowMessageBox($"Could not import flags:\n{ex.Message}", MessageBoxImage.Warning);
+            }
+        }
+
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = $"JSON files (*.json)|*.json|All files (*.*)|*.*",
+                FileName = "MyFastFlags.json"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                File.WriteAllText(dialog.FileName, System.Text.Json.JsonSerializer.Serialize(App.FastFlags.Prop, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                Frontend.ShowMessageBox($"Flags exported to {dialog.FileName}", MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                Frontend.ShowMessageBox($"Could not export flags:\n{ex.Message}", MessageBoxImage.Warning);
+            }
+        }
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             if (Window.GetWindow(this) is INavigationWindow window)

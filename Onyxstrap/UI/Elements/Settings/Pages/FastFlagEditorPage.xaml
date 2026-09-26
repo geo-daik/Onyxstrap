@@ -29,6 +29,8 @@
         <WrapPanel Grid.Row="3" Orientation="Horizontal">
             <ui:Button Icon="ArrowLeft48" Content="{x:Static resources:Strings.Menu_FastFlagEditor_Back}" Click="BackButton_Click" Margin="0,0,12,16" />
             <ui:Button Icon="Add28" Content="{x:Static resources:Strings.Menu_FastFlagEditor_AddNew}" Click="AddButton_Click" Margin="0,0,12,16" />
+            <ui:Button Icon="ArrowImport20" Content="Import flags" Click="ImportButton_Click" Margin="0,0,12,16" />
+            <ui:Button Icon="ArrowExport20" Content="Export flags" Click="ExportButton_Click" Margin="0,0,12,16" />
             <ui:Button Icon="Delete48" Content="{x:Static resources:Strings.Menu_FastFlagEditor_DeleteSelected}" Click="DeleteButton_Click" Appearance="Danger"  Margin="0,0,12,16">
                 <ui:Button.Style>
                     <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">

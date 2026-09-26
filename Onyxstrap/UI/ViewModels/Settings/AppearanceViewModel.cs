@@ -66,6 +66,21 @@ namespace Onyxstrap.UI.ViewModels.Settings
 
         public IEnumerable<Theme> Themes { get; } = Enum.GetValues(typeof(Theme)).Cast<Theme>();
 
+        public IEnumerable<AccentTheme> Accents { get; } = Enum.GetValues<AccentTheme>();
+
+        public AccentTheme AccentTheme
+        {
+            get => App.Settings.Prop.AccentTheme;
+            set
+            {
+                App.Settings.Prop.AccentTheme = value;
+                OnPropertyChanged(nameof(AccentTheme));
+
+                if (Window.GetWindow(_page) is UI.Elements.Settings.MainWindow window)
+                    window.ApplyTheme();
+            }
+        }
+
         public Theme Theme
         {
             get => App.Settings.Prop.Theme;
