@@ -23,7 +23,7 @@ namespace Onyxstrap.Models.Entities
             set
             {
                 _universeId = value;
-                UniverseDetails.LoadFromCache(value);
+                UniverseDetails = UniverseDetails.LoadFromCache(value);
             }
         }
 

@@ -10,7 +10,8 @@
              mc:Ignorable="d" 
              x:Name="Control"
              d:DesignHeight="450" d:DesignWidth="800">
-    <ui:Card Margin="0,8,0,0">
+    <ui:Card Margin="0,10,0,0" Padding="18,16">
+        <ui:Card.Resources><CornerRadius x:Key="ControlCornerRadius">12</CornerRadius></ui:Card.Resources>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -20,10 +21,10 @@
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" FontSize="14" Text="{Binding Header, ElementName=Control}" />
+                    <TextBlock Grid.Column="0" FontSize="14" FontWeight="Medium" TextWrapping="Wrap" Text="{Binding Header, ElementName=Control}" />
                     <TextBlock Grid.Column="1" Margin="4,0,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -58,7 +59,7 @@
                         </Hyperlink>
                     </TextBlock>
                 </Grid>
-                <local:MarkdownTextBlock Margin="0,2,0,0" FontSize="12" MarkdownText="{Binding Description, ElementName=Control}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}">
+                <local:MarkdownTextBlock Margin="0,5,0,0" FontSize="12" MarkdownText="{Binding Description, ElementName=Control}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
                     <local:MarkdownTextBlock.Style>
                         <Style TargetType="local:MarkdownTextBlock">
                             <Style.Triggers>

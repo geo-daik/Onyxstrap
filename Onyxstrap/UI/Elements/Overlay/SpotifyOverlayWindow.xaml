@@ -1,0 +1,101 @@
+<Window x:Class="Onyxstrap.UI.Elements.Overlay.SpotifyOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Onyxstrap Spotify player" Width="380" Height="270"
+        WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True"
+        Background="Transparent" ShowInTaskbar="False" ShowActivated="True"
+        Topmost="True" FontFamily="Segoe UI" Foreground="#F4F6F5"
+        UseLayoutRounding="True">
+    <Window.Resources>
+        <Style x:Key="PlayerButton" TargetType="Button">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Background" Value="#242C29" />
+            <Setter Property="Foreground" Value="#F4F6F5" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.8" /></Trigger>
+                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.6" /></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Surface" Property="Opacity" Value="0.35" /></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Border x:Name="PlayerSurface" Background="#FA141B18" BorderBrush="#3B5145" BorderThickness="1" CornerRadius="18" Padding="18">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28" />
+                <RowDefinition Height="110" />
+                <RowDefinition Height="48" />
+                <RowDefinition Height="46" />
+            </Grid.RowDefinitions>
+            <Grid>
+                <Border Background="Transparent" Margin="0,0,36,0" Cursor="SizeAll" MouseLeftButtonDown="DragHeader" ToolTip="Drag to move">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="7" Height="7" Fill="#1ED760" Margin="0,0,9,0" />
+                        <TextBlock Text="SPOTIFY" FontSize="11" FontWeight="Bold" Foreground="#AFBFB5" />
+                        <TextBlock Text="  ·  drag to move" FontSize="11" Foreground="#8D9C93" />
+                    </StackPanel>
+                </Border>
+                <Button x:Name="CloseButton" Style="{StaticResource PlayerButton}" Width="28" Height="28" HorizontalAlignment="Right"
+                        Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="11"
+                        ToolTip="Hide (Right Shift)" AutomationProperties.Name="Hide Spotify player" Click="CloseClick" />
+            </Grid>
+            <Grid Grid.Row="1" Margin="0,12,0,10">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="102" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Grid Width="86" Height="86" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Grid.Clip><RectangleGeometry Rect="0,0,86,86" RadiusX="13" RadiusY="13" /></Grid.Clip>
+                    <Border Background="#243F2E" />
+                    <TextBlock x:Name="ArtworkPlaceholder" Text="&#xE8D6;" FontFamily="Segoe MDL2 Assets" FontSize="32" Foreground="#1ED760" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Image x:Name="AlbumArtwork" Stretch="UniformToFill" AutomationProperties.Name="Album artwork" />
+                </Grid>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="TrackTitle" Text="Your music, in game" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="TrackArtist" Text="Open Spotify and play a song" FontSize="13" Foreground="#C3CFC8" Margin="0,6,0,0" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="TrackAlbum" FontSize="11" Foreground="#91A599" Margin="0,6,0,0" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="2" Margin="0,3,0,8">
+                <Grid.RowDefinitions><RowDefinition Height="6" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                <ProgressBar x:Name="TrackProgress" Height="4" Minimum="0" Maximum="1" Value="0" Foreground="#1ED760" Background="#34433A" AutomationProperties.Name="Track progress">
+                    <ProgressBar.Template>
+                        <ControlTemplate TargetType="ProgressBar">
+                            <Grid x:Name="PART_Track">
+                                <Border Background="{TemplateBinding Background}" CornerRadius="2" />
+                                <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}" HorizontalAlignment="Left" CornerRadius="2" />
+                            </Grid>
+                        </ControlTemplate>
+                    </ProgressBar.Template>
+                </ProgressBar>
+                <TextBlock x:Name="ElapsedTime" Grid.Row="1" Text="--:--" FontSize="10" Foreground="#91A599" Margin="0,5,0,0" />
+                <TextBlock x:Name="DurationTime" Grid.Row="1" Text="--:--" FontSize="10" Foreground="#91A599" HorizontalAlignment="Right" Margin="0,5,0,0" />
+            </Grid>
+            <Grid Grid.Row="3">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="PreviousButton" Style="{StaticResource PlayerButton}" Content="&#xE892;" FontFamily="Segoe MDL2 Assets"
+                            IsEnabled="False" ToolTip="Previous track" AutomationProperties.Name="Previous track" Click="PreviousClick" />
+                    <Button x:Name="PlayPauseButton" Style="{StaticResource PlayerButton}" Width="48" Margin="7,0" Content="&#xE768;" FontFamily="Segoe MDL2 Assets"
+                            Background="#1ED760" Foreground="#092310" IsEnabled="False" ToolTip="Play" AutomationProperties.Name="Play or pause" Click="PlayPauseClick" />
+                    <Button x:Name="NextButton" Style="{StaticResource PlayerButton}" Content="&#xE893;" FontFamily="Segoe MDL2 Assets"
+                            IsEnabled="False" ToolTip="Next track" AutomationProperties.Name="Next track" Click="NextClick" />
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" MaxWidth="135">
+                    <TextBlock x:Name="PlaybackStatus" Text="NOT CONNECTED" FontSize="9" FontWeight="SemiBold" Foreground="#A8B8AE" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" />
+                    <Border BorderBrush="#405047" BorderThickness="1" CornerRadius="5" Padding="7,3" Margin="0,5,0,0" HorizontalAlignment="Right">
+                        <TextBlock Text="Right Shift" FontSize="10" Foreground="#CBD6CF" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

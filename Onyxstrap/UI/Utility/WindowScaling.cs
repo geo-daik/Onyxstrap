@@ -5,7 +5,8 @@ namespace Onyxstrap.UI.Utility
 {
     public static class WindowScaling
     {
-        public static double ScaleFactor => Screen.PrimaryScreen.Bounds.Width / SystemParameters.PrimaryScreenWidth;
+        public static double ScaleFactor => Screen.PrimaryScreen is { } screen && SystemParameters.PrimaryScreenWidth > 0
+            ? screen.Bounds.Width / SystemParameters.PrimaryScreenWidth : 1;
 
         public static int GetScaledNumber(int number)
         {

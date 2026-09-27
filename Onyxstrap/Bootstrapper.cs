@@ -673,7 +673,7 @@ namespace Onyxstrap
                     autoclosePids.Add(pid);
             }
 
-            if (App.Settings.Prop.EnableActivityTracking || App.LaunchSettings.TestModeFlag.Active || autoclosePids.Any())
+            if (App.Settings.Prop.EnableActivityTracking || App.Settings.Prop.EnableSpotifyOverlay || App.LaunchSettings.TestModeFlag.Active || autoclosePids.Any())
             {
                 using var ipl = new InterProcessLock("Watcher", TimeSpan.FromSeconds(5));
 

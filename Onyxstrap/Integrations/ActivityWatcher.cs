@@ -3,6 +3,8 @@ namespace Onyxstrap.Integrations
     public class ActivityWatcher : IDisposable
     {
         private const string GameMessageEntry                = "[FLog::CreatorOutput] [OnyxstrapRPC]";
+        private const string LegacyGameMessageEntry          = "[FLog::Output] [BloxstrapRPC]";
+        private const string CreatorGameMessageEntry         = "[FLog::CreatorOutput] [BloxstrapRPC]";
         private const string GameJoiningEntry                = "[FLog::Output] ! Joining game";
 
         // these entries are technically volatile!
@@ -22,7 +24,7 @@ namespace Onyxstrap.Integrations
         private const string GameJoiningUniversePattern      = @"universeid:([0-9]+).*userid:([0-9]+)";
         private const string GameJoiningUDMUXPattern         = @"UDMUX Address = ([0-9\.]+), Port = [0-9]+ \| RCC Server Address = ([0-9\.]+), Port = [0-9]+";
         private const string GameJoinedEntryPattern          = @"serverId: ([0-9\.]+)\|[0-9]+";
-        private const string GameMessageEntryPattern         = @"\[OnyxstrapRPC\] (.*)";
+        private const string GameMessageEntryPattern         = @"\[(?:OnyxstrapRPC|BloxstrapRPC)\] (.*)";
 
         private int _logEntriesRead = 0;
         private bool _teleportMarker = false;
@@ -31,6 +33,7 @@ namespace Onyxstrap.Integrations
         public event EventHandler<string>? OnLogEntry;
         public event EventHandler? OnGameJoin;
         public event EventHandler? OnGameLeave;
+        public event EventHandler? OnGameMetadataChanged;
         public event EventHandler? OnLogOpen;
         public event EventHandler? OnAppClose;
         public event EventHandler<Message>? OnRPCMessage;
@@ -48,7 +51,8 @@ namespace Onyxstrap.Integrations
         /// </summary>
         public List<ActivityData> History = new();
 
-        public bool IsDisposed = false;
+        public volatile bool IsDisposed = false;
+        private readonly CancellationTokenSource _stop = new();
 
         public ActivityWatcher(string? logFile = null)
         {
@@ -56,75 +60,61 @@ namespace Onyxstrap.Integrations
                 LogLocation = logFile;
         }
 
-        public async void Start()
+        public async Task StartAsync()
         {
             const string LOG_IDENT = "ActivityWatcher::Start";
-
-            // okay, here's the process:
-            //
-            // - tail the latest log file from %localappdata%\roblox\logs
-            // - check for specific lines to determine player's game activity as shown below:
-            //
-            // - get the place id, job id and machine address from '! Joining game '{{JOBID}}' place {{PLACEID}} at {{MACHINEADDRESS}}' entry
-            // - confirm place join with 'serverId: {{MACHINEADDRESS}}|{{MACHINEPORT}}' entry
-            // - check for leaves/disconnects with 'Time to disconnect replication data: {{TIME}}' entry
-            //
-            // we'll tail the log file continuously, monitoring for any log entries that we need to determine the current game activity
-            
-            FileInfo logFileInfo;
-
-            if (String.IsNullOrEmpty(LogLocation))
+            try
             {
-                string logDirectory = Path.Combine(Paths.LocalAppData, "Roblox\\logs");
-
-                if (!Directory.Exists(logDirectory))
-                    return;
-
-                // we need to make sure we're fetching the absolute latest log file
-                // if roblox doesn't start quickly enough, we can wind up fetching the previous log file
-                // good rule of thumb is to find a log file that was created in the last 15 seconds or so
-
-                App.Logger.WriteLine(LOG_IDENT, "Opening Roblox log file...");
-
-                while (true)
+                DateTime earliestLog = DateTime.Now.AddSeconds(-15);
+                string logDirectory = Path.Combine(Paths.LocalAppData, @"Roblox\logs");
+                FileStream? stream = null;
+                while (!IsDisposed && stream is null)
                 {
-                    logFileInfo = new DirectoryInfo(logDirectory)
-                        .GetFiles()
-                        .Where(x => x.Name.Contains("Player", StringComparison.OrdinalIgnoreCase) && x.CreationTime <= DateTime.Now)
-                        .OrderByDescending(x => x.CreationTime)
-                        .First();
-
-                    if (logFileInfo.CreationTime.AddSeconds(15) > DateTime.Now)
-                        break;
-
-                    App.Logger.WriteLine(LOG_IDENT, $"Could not find recent enough log file, waiting... (newest is {logFileInfo.Name})");
-                    await Task.Delay(1000);
+                    if (string.IsNullOrEmpty(LogLocation) && Directory.Exists(logDirectory))
+                    {
+                        var candidate = new DirectoryInfo(logDirectory).GetFiles("*.log")
+                            .Where(x => x.Name.Contains("Player", StringComparison.OrdinalIgnoreCase) && x.CreationTime >= earliestLog)
+                            .OrderByDescending(x => x.CreationTime).FirstOrDefault();
+                        if (candidate is not null) LogLocation = candidate.FullName;
+                    }
+                    if (!string.IsNullOrEmpty(LogLocation))
+                    {
+                        try { stream = new FileStream(LogLocation, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete); }
+                        catch (IOException) { } // Created can fire before the file becomes readable.
+                    }
+                    if (stream is null) await Task.Delay(250, _stop.Token);
                 }
-
-                LogLocation = logFileInfo.FullName;
+                if (stream is null) return;
+                using var reader = new StreamReader(stream);
+                OnLogOpen?.Invoke(this, EventArgs.Empty);
+                App.Logger.WriteLine(LOG_IDENT, $"Opened {LogLocation}");
+                var pending = new StringBuilder();
+                var buffer = new char[4096];
+                while (!IsDisposed)
+                {
+                    int count = await reader.ReadAsync(buffer.AsMemory(), _stop.Token);
+                    if (count == 0)
+                    {
+                        await Task.Delay(250, _stop.Token);
+                        continue;
+                    }
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (buffer[i] != '\n')
+                        {
+                            pending.Append(buffer[i]);
+                            if (pending.Length > 1024 * 1024) pending.Clear();
+                            continue;
+                        }
+                        string line = pending.ToString().TrimEnd('\r');
+                        pending.Clear();
+                        try { ReadLogEntry(line); }
+                        catch (Exception ex) { App.Logger.WriteException(LOG_IDENT, ex); }
+                    }
+                }
             }
-            else
-            {
-                logFileInfo = new FileInfo(LogLocation);
-            }
-
-            OnLogOpen?.Invoke(this, EventArgs.Empty);
-            
-            var logFileStream = logFileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-            App.Logger.WriteLine(LOG_IDENT, $"Opened {LogLocation}");
-
-            using var streamReader = new StreamReader(logFileStream);
-
-            while (!IsDisposed)
-            {
-                string? log = await streamReader.ReadLineAsync();
-
-                if (log is null)
-                    await Task.Delay(1000);
-                else
-                    ReadLogEntry(log);
-            }
+            catch (OperationCanceledException) when (IsDisposed) { }
+            catch (Exception ex) { App.Logger.WriteException(LOG_IDENT, ex); }
         }
 
         private void ReadLogEntry(string entry)
@@ -143,19 +133,27 @@ namespace Onyxstrap.Integrations
                 App.Logger.WriteLine(LOG_IDENT, $"Read {_logEntriesRead} log entries");
 
             // get the log message from the read line
-            int logMessageIdx = entry.IndexOf(' ');
+            int logMessageIdx = entry.IndexOf("[FLog::", StringComparison.Ordinal);
             if (logMessageIdx == -1)
             {
                 // likely a log message that spanned multiple lines
                 return;
             }
 
-            string logMessage = entry[(logMessageIdx + 1)..];
+            string logMessage = entry[logMessageIdx..];
 
             if (logMessage.StartsWith(GameLeavingEntry))
             {
                 App.Logger.WriteLine(LOG_IDENT, "User is back into the desktop app");
                 
+                if (InGame)
+                {
+                    Data.TimeLeft = DateTime.Now;
+                    History.Insert(0, Data);
+                    InGame = false;
+                    Data = new();
+                    OnGameLeave?.Invoke(this, EventArgs.Empty);
+                }
                 OnAppClose?.Invoke(this, EventArgs.Empty);
 
                 if (Data.PlaceId != 0 && !InGame)
@@ -167,6 +165,48 @@ namespace Onyxstrap.Integrations
                 return;
             }
 
+            if (!InGame && Data.PlaceId != 0 && logMessage.StartsWith(GameDisconnectedEntry))
+            {
+                Data = new();
+                return;
+            }
+
+            if (Data.PlaceId != 0 && logMessage.StartsWith(GameJoiningUniverseEntry))
+            {
+                var match = Regex.Match(logMessage, GameJoiningUniversePattern);
+
+                if (!match.Success || !long.TryParse(match.Groups[1].Value, out _) || !long.TryParse(match.Groups[2].Value, out _))
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "Failed to assert format for game join universe entry");
+                    App.Logger.WriteLine(LOG_IDENT, logMessage);
+                    return;
+                }
+
+                Data.UniverseId = Int64.Parse(match.Groups[1].Value);
+                Data.UserId = Int64.Parse(match.Groups[2].Value);
+
+                var loadTimeMatch = Regex.Match(logMessage, GameJoinReferralPattern);
+
+                if (loadTimeMatch.Groups.Count == 2)
+                {
+                    string referral = loadTimeMatch.Groups[1].Value;
+
+                    if (referral.Contains("RequestPrivateGame", StringComparison.OrdinalIgnoreCase) || referral.Contains("GameDetailPageJSHybridEvent", StringComparison.OrdinalIgnoreCase))
+                        Data.ServerType = ServerType.Private;
+                }
+
+                if (History.Any())
+                {
+                    var lastActivity = History.First();
+
+                    if (Data.UniverseId == lastActivity.UniverseId && Data.IsTeleport)
+                        Data.RootActivity = lastActivity.RootActivity ?? lastActivity;
+                }
+                if (InGame) OnGameMetadataChanged?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+
+
             if (!InGame && Data.PlaceId == 0)
             {
                 // We are not in a game, nor are in the process of joining one
@@ -175,7 +215,7 @@ namespace Onyxstrap.Integrations
                 {
                     Match match = Regex.Match(logMessage, GameJoiningEntryPattern);
 
-                    if (match.Groups.Count != 4)
+                    if (!match.Success || !long.TryParse(match.Groups[2].Value, out _))
                     {
                         App.Logger.WriteLine(LOG_IDENT, $"Failed to assert format for game join entry");
                         App.Logger.WriteLine(LOG_IDENT, logMessage);
@@ -209,43 +249,11 @@ namespace Onyxstrap.Integrations
             {
                 // We are not confirmed to be in a game, but we are in the process of joining one
 
-                if (logMessage.StartsWith(GameJoiningUniverseEntry))
-                {
-                    var match = Regex.Match(logMessage, GameJoiningUniversePattern);
-
-                    if (match.Groups.Count != 3)
-                    {
-                        App.Logger.WriteLine(LOG_IDENT, "Failed to assert format for game join universe entry");
-                        App.Logger.WriteLine(LOG_IDENT, logMessage);
-                        return;
-                    }
-
-                    Data.UniverseId = Int64.Parse(match.Groups[1].Value);
-                    Data.UserId = Int64.Parse(match.Groups[2].Value);
-
-                    var loadTimeMatch = Regex.Match(logMessage, GameJoinReferralPattern);
-
-                    if (loadTimeMatch.Groups.Count == 2)
-                    {
-                        string referral = loadTimeMatch.Groups[1].Value;
-
-                        if (referral.Contains("RequestPrivateGame", StringComparison.OrdinalIgnoreCase) || referral.Contains("GameDetailPageJSHybridEvent", StringComparison.OrdinalIgnoreCase))
-                            Data.ServerType = ServerType.Private;
-                    }
-
-                    if (History.Any())
-                    {
-                        var lastActivity = History.First();
-
-                        if (Data.UniverseId == lastActivity.UniverseId && Data.IsTeleport)
-                            Data.RootActivity = lastActivity.RootActivity ?? lastActivity;
-                    }
-                }
-                else if (logMessage.StartsWith(GameJoiningUDMUXEntry))
+                if (logMessage.StartsWith(GameJoiningUDMUXEntry))
                 {
                     var match = Regex.Match(logMessage, GameJoiningUDMUXPattern);
 
-                    if (match.Groups.Count != 3 || match.Groups[2].Value != Data.MachineAddress)
+                    if (!match.Success || match.Groups[2].Value != Data.MachineAddress)
                     {
                         App.Logger.WriteLine(LOG_IDENT, "Failed to assert format for game join UDMUX entry");
                         App.Logger.WriteLine(LOG_IDENT, logMessage);
@@ -303,11 +311,11 @@ namespace Onyxstrap.Integrations
                         }
                     }
                 }
-                else if (logMessage.StartsWith(GameMessageEntry))
+                else if (logMessage.StartsWith(GameMessageEntry) || logMessage.StartsWith(CreatorGameMessageEntry) || logMessage.StartsWith(LegacyGameMessageEntry) || logMessage.StartsWith("[FLog::Output] [OnyxstrapRPC]"))
                 {
                     var match = Regex.Match(logMessage, GameMessageEntryPattern);
 
-                    if (match.Groups.Count != 2)
+                    if (!match.Success)
                     {
                         App.Logger.WriteLine(LOG_IDENT, $"Failed to assert format for RPC message entry");
                         App.Logger.WriteLine(LOG_IDENT, logMessage);
@@ -386,6 +394,7 @@ namespace Onyxstrap.Integrations
         public void Dispose()
         {
             IsDisposed = true;
+            _stop.Cancel();
             GC.SuppressFinalize(this);
         }
     }

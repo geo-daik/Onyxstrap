@@ -101,10 +101,18 @@ namespace Onyxstrap.UI.ViewModels.Settings
                 {
                     DiscordActivityJoinEnabled = value;
                     DiscordAccountOnProfile = value;
+                    SpotifyRichPresenceEnabled = false;
+                    OnPropertyChanged(nameof(SpotifyRichPresenceEnabled));
                     OnPropertyChanged(nameof(DiscordActivityJoinEnabled));
                     OnPropertyChanged(nameof(DiscordAccountOnProfile));
                 }
             }
+        }
+
+        public bool SpotifyOverlayEnabled
+        {
+            get => App.Settings.Prop.EnableSpotifyOverlay;
+            set => App.Settings.Prop.EnableSpotifyOverlay = value;
         }
 
         public bool SpotifyRichPresenceEnabled

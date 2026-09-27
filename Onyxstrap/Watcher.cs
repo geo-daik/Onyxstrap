@@ -18,6 +18,10 @@ namespace Onyxstrap
         public readonly ActivityWatcher? ActivityWatcher;
 
         public readonly DiscordRichPresence? RichPresence;
+        private readonly SpotifyOverlayController? _spotifyOverlay;
+        private readonly CancellationTokenSource _stop = new();
+        private Task? _activityTask;
+        private Task? _rebrandTask;
 
         public Watcher()
         {
@@ -62,8 +66,7 @@ namespace Onyxstrap
                     ActivityWatcher.OnAppClose += delegate
                     {
                         App.Logger.WriteLine(LOG_IDENT, "Received desktop app exit, closing Roblox");
-                        using var process = Process.GetProcessById(_watcherData.ProcessId);
-                        process.CloseMainWindow();
+                        CloseProcess(_watcherData.ProcessId);
                     };
                 }
 
@@ -72,6 +75,11 @@ namespace Onyxstrap
             }
 
             _notifyIcon = new(this);
+            if (App.Settings.Prop.EnableSpotifyOverlay)
+            {
+                try { _spotifyOverlay = new SpotifyOverlayController(_watcherData.ProcessId); }
+                catch (Exception ex) { App.Logger.WriteException("Watcher::SpotifyOverlay", ex); }
+            }
         }
 
         public void KillRobloxProcess() => CloseProcess(_watcherData!.ProcessId, true);
@@ -110,35 +118,49 @@ namespace Onyxstrap
                 return;
 
             if (App.Settings.Prop.RebrandGameWindow)
-                Task.Run(RebrandGameWindowIcons);
+                _rebrandTask = Task.Run(RebrandGameWindowIcons);
 
-            ActivityWatcher?.Start();
+            _activityTask = ActivityWatcher?.StartAsync();
 
             bool spotifyHotkeyWasDown = false;
+            var spotify = new SpotifyTrackReader();
+            Task<string?>? trackRead = null;
+            DateTime nextTrackRead = DateTime.MinValue;
 
-            while (Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
+            while (!_stop.IsCancellationRequested && IsProcessRunning(_watcherData.ProcessId))
             {
-                // Ctrl+Alt+S bind: toggle showing the current Spotify track in Discord
                 if (RichPresence is not null)
                 {
-                    bool down = Windows.Win32.PInvoke.GetAsyncKeyState(0x11) < 0
-                                && Windows.Win32.PInvoke.GetAsyncKeyState(0x12) < 0
-                                && Windows.Win32.PInvoke.GetAsyncKeyState(0x53) < 0;
+                    bool down = PInvoke.GetAsyncKeyState(0x11) < 0
+                                && PInvoke.GetAsyncKeyState(0x12) < 0
+                                && PInvoke.GetAsyncKeyState(0x53) < 0;
 
                     if (down && !spotifyHotkeyWasDown)
                     {
                         RichPresence.SpotifyEnabled = !RichPresence.SpotifyEnabled;
                         App.Logger.WriteLine("Watcher::Run", $"Spotify presence toggled {(RichPresence.SpotifyEnabled ? "on" : "off")} (bind)");
                     }
-
                     spotifyHotkeyWasDown = down;
 
-                    if (RichPresence.SpotifyEnabled)
-                        RichPresence.SetSpotifyTrack(GetSpotifyTrack());
+                    if (trackRead?.IsCompleted == true)
+                    {
+                        RichPresence.SetSpotifyTrack(RichPresence.SpotifyEnabled ? await trackRead : null);
+                        trackRead = null;
+                        nextTrackRead = DateTime.UtcNow.AddSeconds(2);
+                    }
+                    if (RichPresence.SpotifyEnabled && trackRead is null && DateTime.UtcNow >= nextTrackRead)
+                        trackRead = spotify.GetTrackAsync();
+                    else if (!RichPresence.SpotifyEnabled)
+                        RichPresence.SetSpotifyTrack(null);
                 }
 
-                await Task.Delay(1000);
+                // Sample the shortcut independently of slow media/API requests.
+                await Task.Delay(50);
             }
+
+            ActivityWatcher?.Dispose();
+            if (_activityTask is not null)
+                await _activityTask;
 
             if (_watcherData.AutoclosePids is not null)
             {
@@ -150,33 +172,14 @@ namespace Onyxstrap
                 Process.Start(Paths.Process, "-settings -testmode");
         }
 
-        /// <summary>
-        /// Reads the current Spotify track from the app's window title.
-        /// Returns null when Spotify isn't running or nothing is playing.
-        /// </summary>
-        private static string? GetSpotifyTrack()
+        private static bool IsProcessRunning(int pid)
         {
             try
             {
-                foreach (var process in Utilities.GetProcessesSafe().Where(x => x.ProcessName == "Spotify"))
-                {
-                    if (process.MainWindowHandle == IntPtr.Zero)
-                        continue;
-
-                    string title = process.MainWindowTitle;
-
-                    if (string.IsNullOrWhiteSpace(title) || title.Equals("Spotify", StringComparison.OrdinalIgnoreCase))
-                        return null;
-
-                    return title;
-                }
+                using var process = Process.GetProcessById(pid);
+                return !process.HasExited;
             }
-            catch (Exception)
-            {
-                // process list races are fine to ignore
-            }
-
-            return null;
+            catch (ArgumentException) { return false; }
         }
 
         // kept referenced so the handle stays valid while game windows use it
@@ -199,7 +202,7 @@ namespace Onyxstrap
 
                 var rebranded = new HashSet<int>();
 
-                while (true)
+                while (!_stop.IsCancellationRequested)
                 {
                     var gameProcesses = Utilities.GetProcessesSafe()
                         .Where(x => x.ProcessName == "RobloxPlayerBeta")
@@ -227,7 +230,7 @@ namespace Onyxstrap
                         }
                     }
 
-                    if (gameProcesses.Count == 0 && !Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
+                    if (gameProcesses.Count == 0 && !IsProcessRunning(_watcherData!.ProcessId))
                         return;
 
                     Thread.Sleep(1000);
@@ -243,6 +246,9 @@ namespace Onyxstrap
         {
             App.Logger.WriteLine("Watcher::Dispose", "Disposing Watcher");
 
+            _stop.Cancel();
+            _spotifyOverlay?.Dispose();
+            ActivityWatcher?.Dispose();
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
 

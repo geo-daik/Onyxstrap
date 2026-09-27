@@ -4,7 +4,7 @@ namespace Onyxstrap.Models.Entities
 {
     public class UserDetails
     {
-        private static List<UserDetails> _cache { get; set; } = new();
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, UserDetails> _cache = new();
 
         public GetUserResponse Data { get; set; } = null!;
 
@@ -12,10 +12,7 @@ namespace Onyxstrap.Models.Entities
 
         public static async Task<UserDetails> Fetch(long id)
         {
-            var cacheQuery = _cache.Where(x => x.Data?.Id == id);
-
-            if (cacheQuery.Any())
-                return cacheQuery.First();
+            if (_cache.TryGetValue(id, out var cached)) return cached;
 
             var userResponse = await Http.GetJson<GetUserResponse>($"https://users.roblox.com/v1/users/{id}");
 
@@ -34,7 +31,7 @@ namespace Onyxstrap.Models.Entities
                 Thumbnail = thumbnailResponse.Data.First()
             };
 
-            _cache.Add(details);
+            _cache[id] = details;
 
             return details;
         }

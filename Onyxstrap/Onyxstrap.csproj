@@ -2,13 +2,15 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Onyxstrap.ico</ApplicationIcon>
-    <Version>1.0.10</Version>
-    <FileVersion>1.0.10</FileVersion>
+    <Version>1.2.1</Version>
+    <FileVersion>1.2.1</FileVersion>
+    <Product>Onyxstrap</Product>
+    <Description>Onyxstrap Roblox launcher</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TieredPgo>True</TieredPgo>

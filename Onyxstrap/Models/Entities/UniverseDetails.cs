@@ -5,7 +5,7 @@ namespace Onyxstrap.Models.Entities
     /// </summary>
     public class UniverseDetails
     {
-        private static List<UniverseDetails> _cache { get; set; } = new();
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<long, UniverseDetails> _cache = new();
 
         public GameDetailResponse Data { get; set; } = null!;
 
@@ -16,12 +16,7 @@ namespace Onyxstrap.Models.Entities
 
         public static UniverseDetails? LoadFromCache(long id)
         {
-            var cacheQuery = _cache.Where(x => x.Data?.Id == id);
-
-            if (cacheQuery.Any())
-                return cacheQuery.First();
-
-            return null;
+            return _cache.TryGetValue(id, out var details) ? details : null;
         }
 
         public static Task FetchSingle(long id) => FetchBulk(id.ToString());
@@ -42,11 +37,14 @@ namespace Onyxstrap.Models.Entities
             {
                 long id = long.Parse(strId);
 
-                _cache.Add(new UniverseDetails
+                var data = gameDetailResponse.Data.FirstOrDefault(x => x.Id == id);
+                if (data is null) continue;
+                _cache[id] = new UniverseDetails
                 {
-                    Data = gameDetailResponse.Data.Where(x => x.Id == id).First(),
-                    Thumbnail = universeThumbnailResponse.Data.Where(x => x.TargetId == id).First(),
-                });
+                    Data = data,
+                    Thumbnail = universeThumbnailResponse.Data.FirstOrDefault(x => x.TargetId == id)
+                        ?? new ThumbnailResponse { TargetId = id }
+                };
             }
         }
     }

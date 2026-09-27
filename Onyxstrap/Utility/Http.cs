@@ -11,7 +11,7 @@ namespace Onyxstrap.Utility
         /// <exception cref="JsonException"></exception>
         public static async Task<T> GetJson<T>(string url)
         {
-            var request = await App.HttpClient.GetAsync(url);
+            using var request = await App.HttpClient.GetAsync(url);
 
             request.EnsureSuccessStatusCode();
 

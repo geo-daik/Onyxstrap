@@ -67,7 +67,7 @@ namespace Onyxstrap
                 if (File.Exists(CachePath) && File.GetLastWriteTimeUtc(CachePath) > DateTime.UtcNow.AddDays(-1))
                     return;
 
-                var response = await App.HttpClient.GetAsync("https://clientsettings.roblox.com/v2/settings/application/PCClientBootstrapper");
+                using var response = await App.HttpClient.GetAsync("https://clientsettings.roblox.com/v2/settings/application/PCClientBootstrapper");
                 response.EnsureSuccessStatusCode();
 
                 using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -85,7 +85,7 @@ namespace Onyxstrap
 
                 File.WriteAllText(CachePath, JsonSerializer.Serialize(names));
 
-                _names = _names.Union(names).OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
+                _names = (_names ?? new List<string>()).Union(names, StringComparer.OrdinalIgnoreCase).OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
 
                 App.Logger.WriteLine("FastFlagCatalog::Refresh", $"Catalog refreshed with {names.Count} flags from Roblox");
             }
@@ -129,7 +129,7 @@ namespace Onyxstrap
             }
 
             var results = new List<string>(prefix);
-            results.AddRange(contains);
+            results.AddRange(contains.Take(Math.Max(0, limit - results.Count)));
             return results;
         }
     }
