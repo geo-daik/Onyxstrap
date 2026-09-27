@@ -92,7 +92,7 @@
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" MaxWidth="135">
                     <TextBlock x:Name="PlaybackStatus" Text="NOT CONNECTED" FontSize="9" FontWeight="SemiBold" Foreground="#A8B8AE" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" />
                     <Border BorderBrush="#405047" BorderThickness="1" CornerRadius="5" Padding="7,3" Margin="0,5,0,0" HorizontalAlignment="Right">
-                        <TextBlock Text="Right Shift" FontSize="10" Foreground="#CBD6CF" />
+                        <TextBlock x:Name="ShortcutLabel" Text="Right Shift" FontSize="10" Foreground="#CBD6CF" TextTrimming="CharacterEllipsis" MaxWidth="112" />
                     </Border>
                 </StackPanel>
             </Grid>

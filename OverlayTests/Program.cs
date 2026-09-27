@@ -40,6 +40,56 @@ internal static class Program
             liveWindow.Close();
             return 0;
         }
+        Check(OverlayShortcut.Default.Label == "Right Shift", "default shortcut remains Right Shift");
+        var heldKeys = new HashSet<int> { 0xA1 };
+        Check(OverlayShortcut.Default.IsDown(heldKeys.Contains), "right Shift triggers default");
+        heldKeys = new() { 0xA0 };
+        Check(!OverlayShortcut.Default.IsDown(heldKeys.Contains), "left Shift does not trigger right Shift binding");
+        Check(OverlayShortcut.TryCreate(0x4D, 6, out var custom) && custom.Label == "Ctrl + Shift + M", "custom chord has readable label");
+        heldKeys = new() { 0x4D, 0xA2, 0xA1 };
+        Check(custom.IsDown(heldKeys.Contains), "custom chord accepts either side of modifier keys");
+        heldKeys.Remove(0xA2);
+        Check(!custom.IsDown(heldKeys.Contains), "missing required modifier cannot trigger shortcut");
+        heldKeys.Add(0xA3); heldKeys.Add(0xA4);
+        Check(!custom.IsDown(heldKeys.Contains), "extra modifier cannot trigger shortcut");
+        heldKeys.Remove(0xA4); heldKeys.Add(0x5B);
+        Check(!custom.IsDown(heldKeys.Contains), "Windows shortcuts do not trigger overlay");
+        Check(OverlayShortcut.TryCreate(0x78, 0, out var functionKey) && functionKey.Label == "F9", "function key binding supported");
+        Check(!OverlayShortcut.TryCreate(0x53, 3, out _) && !OverlayShortcut.TryCreate(0x1B, 0, out _), "existing Discord shortcut and Escape are reserved");
+        Check(OverlayShortcut.FromSettings(0, -1) == OverlayShortcut.Default, "invalid saved binding falls back to Right Shift");
+        Check(OverlayShortcut.TryCreate(0xA1, 4, out var shiftOnly) && shiftOnly == OverlayShortcut.Default, "standalone modifier normalizes its own modifier flag");
+        var persisted = System.Text.Json.JsonSerializer.Deserialize<Onyxstrap.Models.Persistable.Settings>(
+            System.Text.Json.JsonSerializer.Serialize(new Onyxstrap.Models.Persistable.Settings { SpotifyOverlayKey = custom.VirtualKey, SpotifyOverlayModifiers = custom.Modifiers }))!;
+        Check(OverlayShortcut.FromSettings(persisted.SpotifyOverlayKey, persisted.SpotifyOverlayModifiers) == custom, "custom shortcut survives settings save and reload");
+        var legacy = System.Text.Json.JsonSerializer.Deserialize<Onyxstrap.Models.Persistable.Settings>("{}")!;
+        Check(OverlayShortcut.FromSettings(legacy.SpotifyOverlayKey, legacy.SpotifyOverlayModifiers) == OverlayShortcut.Default, "existing settings keep default shortcut without migration");
+        string shortcutFile = Path.Combine(Path.GetTempPath(), "onyxstrap-shortcut-" + Guid.NewGuid() + ".json");
+        try
+        {
+            File.WriteAllText(shortcutFile, "{\"SpotifyOverlayKey\":77,\"SpotifyOverlayModifiers\":6}");
+            using var controller = new SpotifyOverlayController(Environment.ProcessId, shortcutFile);
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            var type = typeof(SpotifyOverlayController);
+            void ReloadShortcut()
+            {
+                type.GetField("_nextShortcutRead", flags)!.SetValue(controller, DateTime.MinValue);
+                type.GetField("_settingsWriteTime", flags)!.SetValue(controller, DateTime.MinValue);
+                type.GetMethod("ReadSavedShortcut", flags)!.Invoke(controller, null);
+            }
+            OverlayShortcut Current() => (OverlayShortcut)type.GetField("_shortcut", flags)!.GetValue(controller)!;
+            ReloadShortcut();
+            Check(Current() == custom, "running controller loads saved custom shortcut");
+            var controlledWindow = (SpotifyOverlayWindow)type.GetField("_window", flags)!.GetValue(controller)!;
+            Check(((TextBlock)controlledWindow.FindName("ShortcutLabel")).Text == custom.Label, "live settings refresh updates player badge");
+            File.WriteAllText(shortcutFile, "{"); ReloadShortcut();
+            Check(Current() == custom, "partial settings save preserves working shortcut");
+            File.WriteAllText(shortcutFile, "{\"SpotifyOverlayKey\":120,\"SpotifyOverlayModifiers\":0}"); ReloadShortcut();
+            Check(Current() == functionKey, "running controller switches binding after save without restart");
+            Check((bool)type.GetField("_waitForShortcutRelease", flags)!.GetValue(controller)!, "new binding waits for release before toggling");
+            File.WriteAllText(shortcutFile, "{}"); ReloadShortcut();
+            Check(Current() == OverlayShortcut.Default, "removing custom setting restores default during play");
+        }
+        finally { File.Delete(shortcutFile); }
         var toggle = new OverlayToggle();
         Check(!toggle.Update(false, true), "overlay starts hidden");
         Check(toggle.Update(true, true), "Right Shift opens overlay");
@@ -56,9 +106,15 @@ internal static class Program
         Check(paused.HasTrack && paused.PlayingTrack is null, "paused song retained for overlay but absent from Discord");
         Check((paused with { IsPlaying = true }).PlayingTrack == "Onyx Sessions — Night Drive", "playing state formats track for Discord");
         var vm = new IntegrationsViewModel(); vm.SpotifyOverlayEnabled = true; vm.ActivityTrackingEnabled = false;
+        vm.SetSpotifyShortcut(custom);
+        Check(vm.SpotifyShortcutLabel == "Ctrl + Shift + M" && App.Settings.Prop.SpotifyOverlayKey == 0x4D, "menu edits saved shortcut fields");
+        vm.SetSpotifyShortcut(OverlayShortcut.Default);
         Check(vm.SpotifyOverlayEnabled, "overlay independent of activity tracking and Discord");
         var window = new SpotifyOverlayWindow();
         Check(window.ShowActivated && !window.ShowInTaskbar, "player accepts input without adding a taskbar entry");
+        window.UpdateShortcut(custom.Label);
+        Check(((TextBlock)window.FindName("ShortcutLabel")).Text == custom.Label && ((Button)window.FindName("CloseButton")).ToolTip.ToString()!.Contains(custom.Label), "player badge and close tooltip follow selected shortcut");
+        window.UpdateShortcut(OverlayShortcut.Default.Label);
         window.UpdatePlayback(paused);
         var play = (Button)window.FindName("PlayPauseButton");
         Check((string)play.Content == "\uE768" && play.IsEnabled, "paused track exposes Play control");
@@ -113,6 +169,14 @@ internal static class Program
             frame.Content = integrationPage;
             Check(((IntegrationsViewModel)integrationPage.DataContext).SpotifyOverlayEnabled, "menu preserves enabled overlay setting");
             Pump();
+            var shortcutButton = (Button)integrationPage.FindName("ShortcutButton");
+            Check(shortcutButton.Content.ToString() == "Right Shift", "shortcut picker displays saved binding");
+            shortcutButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Check(shortcutButton.Content.ToString() == "Press shortcut…", "shortcut picker enters recording state");
+            typeof(Onyxstrap.UI.Elements.Settings.Pages.IntegrationsPage).GetMethod("AcceptShortcut", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(integrationPage, new object[] { System.Windows.Input.Key.M, System.Windows.Input.ModifierKeys.Control | System.Windows.Input.ModifierKeys.Shift });
+            Check(shortcutButton.Content.ToString() == "Ctrl + Shift + M", "recorded chord updates picker binding");
+            ((IntegrationsViewModel)integrationPage.DataContext).SetSpotifyShortcut(OverlayShortcut.Default);
+            Check(shortcutButton.Content.ToString() == "Right Shift", "picker binding remains live after recording");
             Render((FrameworkElement)menu.Content, 1080, 720, args[1], menu.Background);
             App.Settings.Prop.Theme = Onyxstrap.Enums.Theme.Light;
             menu.ApplyTheme();

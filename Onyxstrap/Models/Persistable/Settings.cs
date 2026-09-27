@@ -31,6 +31,8 @@ namespace Onyxstrap.Models.Persistable
         public bool HideRPCButtons { get; set; } = true;
         public bool ShowAccountOnRichPresence { get; set; } = false;
         public bool EnableSpotifyOverlay { get; set; } = true;
+        public int SpotifyOverlayKey { get; set; } = 0xA1; // Right Shift
+        public int SpotifyOverlayModifiers { get; set; } = 0;
         public bool ShowSpotifyOnRichPresence { get; set; } = false;
         public bool ShowServerDetails { get; set; } = false;
         public ObservableCollection<CustomIntegration> CustomIntegrations { get; set; } = new();

@@ -28,6 +28,13 @@ namespace Onyxstrap.UI.Elements.Overlay
             };
         }
 
+        internal void UpdateShortcut(string label)
+        {
+            ShortcutLabel.Text = label;
+            ShortcutLabel.ToolTip = label;
+            CloseButton.ToolTip = $"Hide ({label})";
+        }
+
         internal void UpdatePlayback(SpotifyPlayback playback)
         {
             _playback = playback;

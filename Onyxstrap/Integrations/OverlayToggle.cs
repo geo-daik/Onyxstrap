@@ -5,10 +5,10 @@ namespace Onyxstrap.Integrations
         private bool _wasDown;
         public bool IsOpen { get; private set; }
 
-        public bool Update(bool rightShiftDown, bool gameFocused)
+        public bool Update(bool shortcutDown, bool gameFocused)
         {
-            if (rightShiftDown && !_wasDown && gameFocused) IsOpen = !IsOpen;
-            _wasDown = rightShiftDown;
+            if (shortcutDown && !_wasDown && gameFocused) IsOpen = !IsOpen;
+            _wasDown = shortcutDown;
             return IsOpen && gameFocused;
         }
 

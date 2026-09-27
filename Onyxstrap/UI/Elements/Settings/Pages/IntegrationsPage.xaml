@@ -30,13 +30,16 @@
                     <TextBlock Text="Keep your music within reach. Drag the player anywhere over Roblox and control your next track."
                                TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                     <WrapPanel Margin="0,14,0,0">
-                        <Border Padding="8,4" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" Margin="0,0,10,4">
-                            <TextBlock Text="Right Shift" FontSize="11" FontWeight="SemiBold" />
-                        </Border>
+                        <Button x:Name="ShortcutButton" Content="{Binding SpotifyShortcutLabel}" Padding="12,6" Margin="0,0,8,4"
+                                MinWidth="110" Click="ChangeShortcut" PreviewKeyDown="CaptureShortcutDown" PreviewKeyUp="CaptureShortcutUp"
+                                LostKeyboardFocus="CancelShortcutCapture" AutomationProperties.Name="Change Spotify player shortcut"
+                                ToolTip="Click, then press a key or key combination" />
+                        <Button Content="Reset" Padding="10,6" Margin="0,0,10,4" Click="ResetShortcut" ToolTip="Restore Right Shift" />
                         <TextBlock Text="Show / hide · Drag to move" FontSize="11" VerticalAlignment="Center" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                     </WrapPanel>
-                    <TextBlock Text="Open Spotify on your desktop. Changes apply on your next Roblox launch."
+                    <TextBlock x:Name="ShortcutHint" Text="Click the shortcut to change it. Save to apply it to your current game." TextWrapping="Wrap" FontSize="11" Margin="0,6,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="Open Spotify on your desktop. Enabling or disabling the player applies on your next Roblox launch."
                                TextWrapping="Wrap" FontSize="11" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                 </StackPanel>
                 <ui:ToggleSwitch Grid.Column="1" VerticalAlignment="Top" Margin="0,4,0,0" AutomationProperties.Name="Spotify overlay in Roblox"

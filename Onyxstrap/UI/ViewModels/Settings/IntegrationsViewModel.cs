@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Onyxstrap.Integrations;
 using System.Windows.Input;
 
 using Microsoft.Win32;
@@ -107,6 +108,16 @@ namespace Onyxstrap.UI.ViewModels.Settings
                     OnPropertyChanged(nameof(DiscordAccountOnProfile));
                 }
             }
+        }
+
+        public string SpotifyShortcutLabel => OverlayShortcut.FromSettings(
+            App.Settings.Prop.SpotifyOverlayKey, App.Settings.Prop.SpotifyOverlayModifiers).Label;
+
+        internal void SetSpotifyShortcut(OverlayShortcut shortcut)
+        {
+            App.Settings.Prop.SpotifyOverlayKey = shortcut.VirtualKey;
+            App.Settings.Prop.SpotifyOverlayModifiers = shortcut.Modifiers;
+            OnPropertyChanged(nameof(SpotifyShortcutLabel));
         }
 
         public bool SpotifyOverlayEnabled

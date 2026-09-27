@@ -9,6 +9,7 @@ namespace Onyxstrap.Integrations
     internal sealed class SpotifyOverlayController : IDisposable
     {
         private readonly int _processId;
+        private readonly string _settingsPath;
         private readonly SpotifyTrackReader _spotify = new();
         private readonly OverlayToggle _toggle = new();
         private readonly SpotifyOverlayWindow _window = new();
@@ -19,14 +20,21 @@ namespace Onyxstrap.Integrations
         private Rect _gameBounds = Rect.Empty;
         private DateTime _nextRead;
         private DateTime _nextBoundsRead;
+        private OverlayShortcut _shortcut;
+        private DateTime _nextShortcutRead;
+        private DateTime _settingsWriteTime;
+        private bool _waitForShortcutRelease;
         private bool _reading;
         private Task _readTask = Task.CompletedTask;
         private bool _sending;
         private bool _disposed;
 
-        public SpotifyOverlayController(int processId)
+        public SpotifyOverlayController(int processId, string? settingsPath = null)
         {
             _processId = processId;
+            _settingsPath = settingsPath ?? App.Settings.FileLocation;
+            _shortcut = OverlayShortcut.FromSettings(App.Settings.Prop.SpotifyOverlayKey, App.Settings.Prop.SpotifyOverlayModifiers);
+            _window.UpdateShortcut(_shortcut.Label);
             try
             {
                 if (File.Exists(_positionPath))
@@ -52,7 +60,14 @@ namespace Onyxstrap.Integrations
             bool overlayFocused = foreground == overlayHandle;
             if (pid == _processId && !overlayFocused) _gameWindow = foreground;
             bool gameFocused = (pid == _processId || overlayFocused) && _gameWindow != 0 && !IsIconic(_gameWindow);
-            bool show = _toggle.Update(GetAsyncKeyState(0xA1) < 0, gameFocused); // VK_RSHIFT only
+            ReadSavedShortcut();
+            bool down = _shortcut.IsDown(key => GetAsyncKeyState(key) < 0);
+            if (_waitForShortcutRelease)
+            {
+                _waitForShortcutRelease = down;
+                down = false;
+            }
+            bool show = _toggle.Update(down, gameFocused);
             if (!show)
             {
                 if (_window.IsVisible)
@@ -88,6 +103,34 @@ namespace Onyxstrap.Integrations
                 _nextRead = DateTime.MinValue;
             }
             if (!_reading && !_sending && DateTime.UtcNow >= _nextRead) _readTask = RefreshAsync();
+        }
+
+        private void ReadSavedShortcut()
+        {
+            if (DateTime.UtcNow < _nextShortcutRead) return;
+            _nextShortcutRead = DateTime.UtcNow.AddSeconds(1);
+            try
+            {
+                string path = _settingsPath;
+                var modified = File.GetLastWriteTimeUtc(path);
+                if (modified == _settingsWriteTime || !File.Exists(path)) return;
+                using var json = JsonDocument.Parse(File.ReadAllText(path));
+                var root = json.RootElement;
+                int key = root.TryGetProperty("SpotifyOverlayKey", out var k) ? k.GetInt32() : 0xA1;
+                int modifiers = root.TryGetProperty("SpotifyOverlayModifiers", out var m) ? m.GetInt32() : 0;
+                var shortcut = OverlayShortcut.FromSettings(key, modifiers);
+                if (shortcut != _shortcut)
+                {
+                    _shortcut = shortcut;
+                    _window.UpdateShortcut(shortcut.Label);
+                    _waitForShortcutRelease = true;
+                }
+                _settingsWriteTime = modified;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
+            {
+                // A save may be in progress. Keep the working binding and retry next second.
+            }
         }
 
         private async Task RefreshAsync()
