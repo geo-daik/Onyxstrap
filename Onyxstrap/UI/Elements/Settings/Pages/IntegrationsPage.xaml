@@ -52,6 +52,12 @@
             <ui:ToggleSwitch IsChecked="{Binding DiscordActivityEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl
+            Header="Spotify in Rich Presence"
+            Description="Show the track you are listening to on Spotify in your Discord status while playing. Toggle live in-game with Ctrl+Alt+S.">
+            <ui:ToggleSwitch IsChecked="{Binding SpotifyRichPresenceEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <controls:OptionControl 
             Header="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Title}" 
             Description="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Description}"

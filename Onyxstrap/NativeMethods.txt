@@ -5,3 +5,4 @@ SetWindowLong
 SHObjectProperties
 SendMessage
 WM_SETICON
+GetAsyncKeyState

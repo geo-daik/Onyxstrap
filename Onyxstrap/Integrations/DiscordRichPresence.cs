@@ -21,6 +21,15 @@ namespace Onyxstrap.Integrations
 
         private bool _visible = true;
 
+        private string? _spotifyTrack;
+        private string? _stateBeforeSpotify;
+
+        /// <summary>
+        /// Runtime toggle for showing the current Spotify track in the presence
+        /// (flipped live with the Ctrl+Alt+S bind or the settings toggle).
+        /// </summary>
+        public bool SpotifyEnabled { get; set; } = App.Settings.Prop.ShowSpotifyOnRichPresence;
+
         public DiscordRichPresence(ActivityWatcher activityWatcher)
         {
             const string LOG_IDENT = "DiscordRichPresence";
@@ -307,6 +316,39 @@ namespace Onyxstrap.Integrations
                 _fetchThumbnailsToken = new CancellationTokenSource();
                 Task.Run(() => UpdatePresenceIconsAsync(_smallImgBeingFetched, _largeImgBeingFetched, implicitUpdate, _fetchThumbnailsToken.Token));
             }
+        }
+
+        /// <summary>
+        /// Overrides the presence state line with the current Spotify track
+        /// (or restores the game state when stopped/toggled off).
+        /// </summary>
+        public void SetSpotifyTrack(string? track)
+        {
+            const string LOG_IDENT = "DiscordRichPresence::SetSpotifyTrack";
+
+            if (_currentPresence is null || _originalPresence is null)
+                return;
+
+            if (!SpotifyEnabled || string.IsNullOrWhiteSpace(track))
+            {
+                if (_stateBeforeSpotify is not null)
+                {
+                    _currentPresence.State = _stateBeforeSpotify;
+                    _stateBeforeSpotify = null;
+                    UpdatePresence();
+                }
+
+                return;
+            }
+
+            if (_currentPresence.State == track)
+                return;
+
+            _stateBeforeSpotify ??= _currentPresence.State;
+            _currentPresence.State = $"Listening to {track}";
+
+            App.Logger.WriteLine(LOG_IDENT, $"Presence state set to Spotify track: {track}");
+            UpdatePresence();
         }
 
         public void SetVisibility(bool visible)

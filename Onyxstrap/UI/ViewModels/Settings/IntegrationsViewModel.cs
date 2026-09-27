@@ -107,6 +107,12 @@ namespace Onyxstrap.UI.ViewModels.Settings
             }
         }
 
+        public bool SpotifyRichPresenceEnabled
+        {
+            get => App.Settings.Prop.ShowSpotifyOnRichPresence;
+            set => App.Settings.Prop.ShowSpotifyOnRichPresence = value;
+        }
+
         public bool DiscordActivityJoinEnabled
         {
             get => !App.Settings.Prop.HideRPCButtons;

@@ -114,8 +114,31 @@ namespace Onyxstrap
 
             ActivityWatcher?.Start();
 
+            bool spotifyHotkeyWasDown = false;
+
             while (Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
+            {
+                // Ctrl+Alt+S bind: toggle showing the current Spotify track in Discord
+                if (RichPresence is not null)
+                {
+                    bool down = Windows.Win32.PInvoke.GetAsyncKeyState(0x11) < 0
+                                && Windows.Win32.PInvoke.GetAsyncKeyState(0x12) < 0
+                                && Windows.Win32.PInvoke.GetAsyncKeyState(0x53) < 0;
+
+                    if (down && !spotifyHotkeyWasDown)
+                    {
+                        RichPresence.SpotifyEnabled = !RichPresence.SpotifyEnabled;
+                        App.Logger.WriteLine("Watcher::Run", $"Spotify presence toggled {(RichPresence.SpotifyEnabled ? "on" : "off")} (bind)");
+                    }
+
+                    spotifyHotkeyWasDown = down;
+
+                    if (RichPresence.SpotifyEnabled)
+                        RichPresence.SetSpotifyTrack(GetSpotifyTrack());
+                }
+
                 await Task.Delay(1000);
+            }
 
             if (_watcherData.AutoclosePids is not null)
             {
@@ -125,6 +148,35 @@ namespace Onyxstrap
 
             if (App.LaunchSettings.TestModeFlag.Active)
                 Process.Start(Paths.Process, "-settings -testmode");
+        }
+
+        /// <summary>
+        /// Reads the current Spotify track from the app's window title.
+        /// Returns null when Spotify isn't running or nothing is playing.
+        /// </summary>
+        private static string? GetSpotifyTrack()
+        {
+            try
+            {
+                foreach (var process in Utilities.GetProcessesSafe().Where(x => x.ProcessName == "Spotify"))
+                {
+                    if (process.MainWindowHandle == IntPtr.Zero)
+                        continue;
+
+                    string title = process.MainWindowTitle;
+
+                    if (string.IsNullOrWhiteSpace(title) || title.Equals("Spotify", StringComparison.OrdinalIgnoreCase))
+                        return null;
+
+                    return title;
+                }
+            }
+            catch (Exception)
+            {
+                // process list races are fine to ignore
+            }
+
+            return null;
         }
 
         // kept referenced so the handle stays valid while game windows use it
