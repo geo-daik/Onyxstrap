@@ -21,13 +21,15 @@ Everything from Bloxstrap:
 
 Plus Onyxstrap's own:
 
+- **Account Manager** - save your Roblox accounts (one-time embedded login, tokens encrypted with DPAPI) and launch straight into the one you pick. Switching is per-launch and transactional: the session swap is backed up and only committed once the client is running
+- **Essentials** - favorite games with one-click play and preference backup
 - **Onyx identity** - animated cutscene bootstrapper, branded installer and launch menu, and the gem icon on the Roblox window while playing
 - **Spotify player** - a draggable in-game overlay with your current track and skip controls (Right Shift to toggle), plus Spotify in your Discord status
 - **Onyx loading screen** - a built-in mod that replaces the Roblox loading screen with a deep onyx one
 - **Quick + game presets** - one-click FastFlag bundles, rebuilt on long-proven flags only
 - **Privacy-first defaults** - no analytics.
 
-> The Account Manager (saved accounts / one-click switching) is temporarily removed while its session-switching mechanism is reworked. It will return in a future release.
+
 
 ## How accounts are stored
 
@@ -52,7 +54,7 @@ Help lives in the [wiki](https://github.com/geo-daik/Onyxstrap/wiki):
 
 ## Building from source
 
-Requires the .NET 8 SDK (the project targets `net8.0-windows10.0.19041.0`; previously `net6.0-windows`):
+Requires the .NET 8 SDK (the project targets `net6.0-windows`):
 
 ```
 git clone --recursive <this repo>
