@@ -30,6 +30,8 @@ namespace Onyxstrap
 
         public LaunchFlag UpgradeFlag               { get; } = new("upgrade");
         
+        public LaunchFlag AccountFlag { get; } = new("account");
+
         public LaunchFlag PlayerFlag                { get; } = new("player");
         
         public LaunchFlag StudioFlag                { get; } = new("studio");

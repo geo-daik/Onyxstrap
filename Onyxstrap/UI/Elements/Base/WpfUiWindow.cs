@@ -30,6 +30,7 @@ namespace Onyxstrap.UI.Elements.Base
 
             // there doesn't seem to be a way to query the name for merged dictionaries
             var dict = new ResourceDictionary { Source = new Uri($"pack://application:,,,/UI/Style/{Enum.GetName(App.Settings.Prop.Theme.GetFinal())}.xaml") };
+            ThemeColors.ApplySurfaces(dict, ThemeColors.Accent(App.Settings.Prop), themeType == ThemeType.Dark);
             Application.Current.Resources.MergedDictionaries[customThemeIndex] = dict;
 
 #if QA_BUILD

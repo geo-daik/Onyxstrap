@@ -11,6 +11,11 @@ namespace Onyxstrap.Models.Persistable
         public string BootstrapperIconCustomLocation { get; set; } = "";
         public Theme Theme { get; set; } = Theme.Dark;
         public AccentTheme AccentTheme { get; set; } = AccentTheme.OnyxViolet;
+        public string CustomAccentColor { get; set; } = "#7C6FD8";
+        public SpotifyColorMode SpotifyColorMode { get; set; } = SpotifyColorMode.Custom;
+        public string SpotifyAccentColor { get; set; } = "#1ED760";
+        public bool SpotifyCompactMode { get; set; } = false;
+        public ObservableCollection<ColorProfile> ColorProfiles { get; set; } = new();
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool DeveloperMode { get; set; } = false;
         public bool CheckForUpdates { get; set; } = false;
@@ -24,6 +29,9 @@ namespace Onyxstrap.Models.Persistable
         public bool DebugDisableVersionPackageCleanup { get; set; } = false;
         public string? SelectedCustomTheme { get; set; } = null;
         public WebEnvironment WebEnvironment { get; set; } = WebEnvironment.Production;
+
+        public ObservableCollection<FavoriteGame> FavoriteGames { get; set; } = new();
+        public bool SpotifySnapToEdges { get; set; } = true;
 
         // integration configuration
         public bool EnableActivityTracking { get; set; } = true;

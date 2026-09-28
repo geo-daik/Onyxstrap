@@ -16,6 +16,8 @@ namespace Onyxstrap.Integrations
         private readonly DispatcherTimer _timer;
         private readonly string _positionPath = Path.Combine(Paths.Base, "SpotifyOverlay.json");
         private OverlayPosition _position = new();
+        private string _monitor = "";
+        private bool _snap = App.Settings.Prop.SpotifySnapToEdges;
         private nint _gameWindow;
         private Rect _gameBounds = Rect.Empty;
         private DateTime _nextRead;
@@ -42,6 +44,7 @@ namespace Onyxstrap.Integrations
             }
             catch (Exception ex) { App.Logger.WriteException("SpotifyOverlay::LoadPosition", ex); }
             if (!double.IsFinite(_position.X) || !double.IsFinite(_position.Y)) _position = new();
+            _position.Monitors ??= new();
             new WindowInteropHelper(_window).EnsureHandle();
             _window.HideRequested += CloseOverlay;
             _window.DragCompleted += SavePosition;
@@ -88,11 +91,19 @@ namespace Onyxstrap.Integrations
                     var topLeft = transform.Transform(new Point(rect.Left, rect.Top));
                     var bottomRight = transform.Transform(new Point(rect.Right, rect.Bottom));
                     _gameBounds = new Rect(topLeft, bottomRight);
+                    var screen = System.Windows.Forms.Screen.FromHandle(_gameWindow);
+                    _monitor = screen.DeviceName;
+                    var work = screen.WorkingArea;
+                    var workBounds = new Rect(transform.Transform(new Point(work.Left, work.Top)), transform.Transform(new Point(work.Right, work.Bottom)));
+                    var visibleBounds = Rect.Intersect(_gameBounds, workBounds);
+                    if (!visibleBounds.IsEmpty) _gameBounds = visibleBounds;
                 }
                 if (!_window.IsDragging && !_gameBounds.IsEmpty)
                 {
-                    _window.Left = _gameBounds.Left + _position.X;
-                    _window.Top = _gameBounds.Top + _position.Y;
+                    var offset = _position.Monitors.GetValueOrDefault(_monitor) ?? new OverlayOffset { X = _position.X, Y = _position.Y };
+                    var point = OverlayPlacement.Resolve(offset, _gameBounds, _window.Width, _window.Height);
+                    _window.Left = point.X;
+                    _window.Top = point.Y;
                     _window.FitWithin(_gameBounds);
                 }
             }
@@ -125,6 +136,8 @@ namespace Onyxstrap.Integrations
                     _window.UpdateShortcut(shortcut.Label);
                     _waitForShortcutRelease = true;
                 }
+                var appearance = JsonSerializer.Deserialize<Models.Persistable.Settings>(root.GetRawText());
+                if (appearance is not null) { _window.UpdateAppearance(appearance); _snap = appearance.SpotifySnapToEdges; }
                 _settingsWriteTime = modified;
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
@@ -182,8 +195,12 @@ namespace Onyxstrap.Integrations
         {
             if (_gameBounds.IsEmpty) return;
             _window.FitWithin(_gameBounds);
-            _position.X = _window.Left - _gameBounds.Left;
-            _position.Y = _window.Top - _gameBounds.Top;
+            var offset = OverlayPlacement.Capture(new Point(_window.Left, _window.Top), _gameBounds, _window.Width, _window.Height, _snap);
+            _position.Monitors[_monitor] = offset;
+            var point = OverlayPlacement.Resolve(offset, _gameBounds, _window.Width, _window.Height);
+            _window.Left = point.X; _window.Top = point.Y;
+            _position.X = point.X - _gameBounds.Left;
+            _position.Y = point.Y - _gameBounds.Top;
             try
             {
                 string tempPath = _positionPath + ".tmp";
@@ -213,6 +230,7 @@ namespace Onyxstrap.Integrations
         private sealed class OverlayPosition
         {
             public OverlayPosition() { }
+            public Dictionary<string, OverlayOffset> Monitors { get; set; } = new();
             public double X { get; set; } = 28;
             public double Y { get; set; } = 90;
         }

@@ -57,8 +57,8 @@
                         BorderThickness="1" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
                     <Border.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#258A80DC" Offset="0" />
-                            <GradientStop Color="#058A80DC" Offset="1" />
+                            <GradientStop Color="{DynamicResource OnyxHeroStart}" Offset="0" />
+                            <GradientStop Color="{DynamicResource OnyxHeroEnd}" Offset="1" />
                         </LinearGradientBrush>
                     </Border.Background>
                     <Grid>
@@ -87,6 +87,8 @@
 
             <ui:NavigationFluent x:Name="RootNavigation" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Width="200" Margin="0,0,20,0" Frame="{Binding ElementName=RootFrame}" SelectedPageIndex="0" TransitionType="FadeIn" TransitionDuration="200">
                 <ui:NavigationFluent.Items>
+                    <ui:NavigationItem Content="Essentials" PageType="{x:Type pages:EssentialsPage}" Icon="Star24" Tag="essentials" />
+                    <ui:NavigationItem Content="Accounts" PageType="{x:Type pages:AccountsPage}" Icon="Person24" Tag="accounts" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Integrations_Title}" PageType="{x:Type pages:IntegrationsPage}" Icon="Add28" Tag="integrations" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Behaviour_Title}" PageType="{x:Type pages:BehaviourPage}" Icon="PlaySettings20" Tag="bootstrapper" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Mods_Title}" PageType="{x:Type pages:ModsPage}" Icon="WrenchScrewdriver20" Tag="mods" />

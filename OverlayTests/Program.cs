@@ -5,6 +5,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Onyxstrap;
 using Onyxstrap.Integrations;
+using Onyxstrap.Extensions;
+using Onyxstrap.Enums;
 using Onyxstrap.UI.Elements.Overlay;
 using Onyxstrap.UI.ViewModels.Settings;
 
@@ -30,6 +32,64 @@ internal static class Program
         application.Resources["EnumNameConverter"] = new Onyxstrap.UI.Converters.EnumNameConverter();
         application.Resources["RangeConverter"] = new Onyxstrap.UI.Converters.RangeConverter();
         typeof(App).GetProperty(nameof(App.LaunchSettings))!.SetValue(null, new LaunchSettings(Array.Empty<string>()));
+        if (args.Length > 1 && args[0] == "--essentials")
+        {
+            App.Settings.Prop.FavoriteGames.Add(new Onyxstrap.Models.FavoriteGame { Name = "My favorite game", PlaceId = 123456 });
+            var page = new Onyxstrap.UI.Elements.Settings.Pages.EssentialsPage();
+            var menu = new Onyxstrap.UI.Elements.Settings.MainWindow(false);
+            App.Settings.Prop.Theme = Onyxstrap.Enums.Theme.Dark;
+            menu.ApplyTheme();
+            ((Frame)menu.FindName("RootFrame")).Content = page;
+            page.RaiseEvent(new RoutedEventArgs(FrameworkElement.LoadedEvent));
+            Pump();
+            var snapToggle = (Wpf.Ui.Controls.ToggleSwitch)page.FindName("SnapToggle");
+            Check(snapToggle.GetBindingExpression(Wpf.Ui.Controls.ToggleSwitch.IsCheckedProperty) is not null, "refresh preserves snapping binding");
+            snapToggle.SetCurrentValue(Wpf.Ui.Controls.ToggleSwitch.IsCheckedProperty, false);
+            Check(!App.Settings.Prop.SpotifySnapToEdges, "snapping toggle updates preferences");
+            Render((FrameworkElement)menu.Content, 1080, 820, args[1], menu.Background);
+            App.Settings.Prop.Theme = Onyxstrap.Enums.Theme.Light;
+            menu.ApplyTheme(); Pump();
+            Render((FrameworkElement)menu.Content, 1080, 820, args[1].Replace(".png", "-light.png"), menu.Background);
+            ScrollViewer? FindScroll(DependencyObject root)
+            {
+                if (root is ScrollViewer scroll) return scroll;
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++) {
+                    var found = FindScroll(VisualTreeHelper.GetChild(root, i));
+                    if (found is not null) return found;
+                }
+                return null;
+            }
+            var pageScroll = FindScroll(page);
+            Check(pageScroll is not null, "essentials page supports scrolling to backup controls");
+            pageScroll!.ScrollToEnd(); Pump();
+            Render((FrameworkElement)menu.Content, 1080, 820, args[1].Replace(".png", "-backup.png"), menu.Background);
+            Check(true, "essentials page renders in dark and light themes");
+            return 0;
+        }
+        if (args.Length > 1 && args[0] == "--accounts")
+        {
+            string fixture = Path.Combine(AppContext.BaseDirectory, "account-preview-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(fixture);
+            try {
+                var store = new AccountManager(Path.Combine(fixture, "Accounts.json"));
+                store.SaveSession(12345, "Example account", "synthetic-preview-session");
+                var page = new Onyxstrap.UI.Elements.Settings.Pages.AccountsPage(store);
+                page.RaiseEvent(new RoutedEventArgs(FrameworkElement.LoadedEvent));
+                var menu = new Onyxstrap.UI.Elements.Settings.MainWindow(false);
+                App.Settings.Prop.Theme = Onyxstrap.Enums.Theme.Dark;
+                menu.ApplyTheme();
+                var frame = (Frame)menu.FindName("RootFrame");
+                frame.Content = page;
+                Pump();
+                Render((FrameworkElement)menu.Content, 1080, 720, args[1], menu.Background);
+                App.Settings.Prop.Theme = Onyxstrap.Enums.Theme.Light;
+                menu.ApplyTheme(); Pump();
+                Render((FrameworkElement)menu.Content, 1080, 720, args[1].Replace(".png", "-light.png"), menu.Background);
+                Check(true, "accounts page renders with a synthetic saved account");
+            }
+            finally { Directory.Delete(fixture, true); }
+            return 0;
+        }
         if (args.Length > 0 && args[0] == "--live-read")
         {
             var live = Task.Run(() => new SpotifyTrackReader().GetPlaybackAsync()).GetAwaiter().GetResult();
@@ -88,8 +148,33 @@ internal static class Program
             Check((bool)type.GetField("_waitForShortcutRelease", flags)!.GetValue(controller)!, "new binding waits for release before toggling");
             File.WriteAllText(shortcutFile, "{}"); ReloadShortcut();
             Check(Current() == OverlayShortcut.Default, "removing custom setting restores default during play");
+            File.WriteAllText(shortcutFile, "{\"SpotifyAccentColor\":\"#FF8800\",\"SpotifyCompactMode\":true}"); ReloadShortcut();
+            Check(controlledWindow.Width == 340 && ((SolidColorBrush)controlledWindow.Resources["PlayerAccent"]).Color == Color.FromRgb(255, 136, 0), "saved color and compact mode update running player");
         }
         finally { File.Delete(shortcutFile); }
+        Check(ThemeColors.TryParse(" #ff8800 ", out var orange) && ThemeColors.Hex(orange) == "#FF8800", "custom hex colors normalize correctly");
+        Check(!ThemeColors.TryParse("#00FF0000", out _) && !ThemeColors.TryParse("##ABCDEF", out _) && !ThemeColors.TryParse("oops", out _), "invalid and transparent custom colors rejected");
+        foreach (var c in new[] { Colors.Black, Colors.White, Colors.Red, Colors.Blue, Colors.Yellow })
+            Check(ThemeColors.Contrast(c, ThemeColors.TextOn(c)) >= 4.5, "button text contrast for " + c);
+        int refreshCount = 0;
+        var colorVm = new ColorThemeViewModel(() => refreshCount++);
+        Check(colorVm.Swatches.Count() == 20, "twenty preset colors available");
+        colorVm.AccentHex = "#12ABCD";
+        Check(App.Settings.Prop.AccentTheme == AccentTheme.Custom && App.Settings.Prop.CustomAccentColor == "#12ABCD" && refreshCount > 0, "custom color updates settings and preview");
+        colorVm.AccentHex = "invalid";
+        Check(App.Settings.Prop.CustomAccentColor == "#12ABCD", "invalid draft keeps last valid color");
+        colorVm.PlayerMode = SpotifyColorMode.AlbumArt; colorVm.Compact = true;
+        colorVm.ProfileName = "Night"; colorVm.SaveProfile();
+        Check(colorVm.Profiles.Count == 1, "profile captures current theme");
+        colorVm.Accent = AccentTheme.Coral; colorVm.Compact = false; colorVm.ApplyProfile();
+        Check(colorVm.Accent == AccentTheme.Custom && colorVm.Compact && colorVm.PlayerMode == SpotifyColorMode.AlbumArt, "profile restores accent player mode and compact layout");
+        colorVm.ProfileName = "night"; colorVm.SaveProfile();
+        Check(colorVm.Profiles.Count == 1, "same profile name updates existing profile");
+        var profileRoundTrip = System.Text.Json.JsonSerializer.Deserialize<Onyxstrap.Models.Persistable.Settings>(System.Text.Json.JsonSerializer.Serialize(App.Settings.Prop))!;
+        Check(profileRoundTrip.ColorProfiles.Count == 1 && profileRoundTrip.ColorProfiles[0].Compact && profileRoundTrip.ColorProfiles[0].CustomAccent == "#12ABCD", "theme profile survives save and reload");
+        colorVm.DeleteProfile(); Check(colorVm.Profiles.Count == 0, "profile removal works");
+        colorVm.ResetColorsCommand.Execute(null);
+        Check(colorVm.Accent == AccentTheme.OnyxViolet && !colorVm.Compact && colorVm.PlayerHex == "#1ED760", "reset restores original palette and layout");
         var toggle = new OverlayToggle();
         Check(!toggle.Update(false, true), "overlay starts hidden");
         Check(toggle.Update(true, true), "Right Shift opens overlay");
@@ -158,6 +243,23 @@ internal static class Program
         window.UpdatePlayback(paused with { Title = new string('界', 120), Artist = new string('W', 180) });
         ((FrameworkElement)window.Content).Measure(new Size(380, 270));
         Check(((FrameworkElement)window.Content).DesiredSize.Width <= 380, "long song information stays inside player");
+        var look = new Onyxstrap.Models.Persistable.Settings { AccentTheme = AccentTheme.Custom, CustomAccentColor = "#12ABCD", SpotifyColorMode = SpotifyColorMode.MatchApp };
+        window.UpdateAppearance(look);
+        Check(((SolidColorBrush)window.Resources["PlayerAccent"]).Color == ThemeColors.Parse("#12ABCD", Colors.Black), "player can match custom app accent");
+        look.SpotifyCompactMode = true; window.UpdateAppearance(look); window.UpdatePlayback(song);
+        Check(window.Height == 194 && window.Width == 340 && ((TextBlock)window.FindName("TrackAlbum")).Visibility == Visibility.Collapsed, "compact player uses smaller layout and keeps song info");
+        Render((FrameworkElement)window.Content, 340, 194, (args.Length > 0 ? args[0] : "overlay-preview.png").Replace(".png", "-compact.png"));
+        look.SpotifyColorMode = SpotifyColorMode.AlbumArt; window.UpdateAppearance(look);
+        var sampled = ((SolidColorBrush)window.Resources["PlayerAccent"]).Color;
+        Check(sampled != ThemeColors.Parse("#1ED760", Colors.Black), "album artwork drives player color");
+        Check(ThemeColors.Contrast(sampled, ((SolidColorBrush)window.Resources["PlayerBackground"]).Color) >= 3, "album accent remains visible against player");
+        Render((FrameworkElement)window.Content, 340, 194, (args.Length > 0 ? args[0] : "overlay-preview.png").Replace(".png", "-album.png"));
+        window.UpdatePlayback(SpotifyPlayback.Empty);
+        Check(((SolidColorBrush)window.Resources["PlayerAccent"]).Color == ThemeColors.Parse("#1ED760", Colors.Black), "missing artwork restores fallback color");
+        look.SpotifyColorMode = SpotifyColorMode.Custom; look.SpotifyAccentColor = "#000000"; window.UpdateAppearance(look);
+        Check(ThemeColors.Contrast(((SolidColorBrush)window.Resources["PlayerAccent"]).Color, ((SolidColorBrush)window.Resources["PlayerBackground"]).Color) >= 3, "black custom color adjusted for visible controls");
+        look.SpotifyCompactMode = false; window.UpdateAppearance(look);
+        Check(window.Width == 380 && window.Height == 270 && ((TextBlock)window.FindName("TrackAlbum")).Visibility == Visibility.Visible, "full player layout can be restored");
         window.Close();
         if (args.Length > 1)
         {
@@ -182,6 +284,18 @@ internal static class Program
             menu.ApplyTheme();
             Pump();
             Render((FrameworkElement)menu.Content, 1080, 720, args[1].Replace(".png", "-light.png"), menu.Background);
+            App.Settings.Prop.Theme = Onyxstrap.Enums.Theme.Dark;
+            App.Settings.Prop.AccentTheme = AccentTheme.Teal;
+            menu.ApplyTheme(); Pump();
+            var panel = new Onyxstrap.UI.Elements.Controls.ColorThemePanel();
+            var panelVm = (ColorThemeViewModel)panel.DataContext;
+            panelVm.PlayerMode = SpotifyColorMode.AlbumArt;
+            panelVm.Compact = true;
+            panelVm.ProfileName = "Evening"; panelVm.SaveProfile();
+            Render(panel, 650, 660, args[1].Replace(".png", "-colors.png"), menu.Background);
+            App.Settings.Prop.Theme = Onyxstrap.Enums.Theme.Light; menu.ApplyTheme(); Pump();
+            var lightPanel = new Onyxstrap.UI.Elements.Controls.ColorThemePanel();
+            Render(lightPanel, 650, 660, args[1].Replace(".png", "-colors-light.png"), menu.Background);
             // No Show/Close: preview generation must not launch Roblox or persist settings.
         }
         Console.WriteLine($"{_passed} overlay checks passed.");

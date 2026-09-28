@@ -7,8 +7,8 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Onyxstrap.ico</ApplicationIcon>
-    <Version>1.2.2</Version>
-    <FileVersion>1.2.2</FileVersion>
+    <Version>1.4.0</Version>
+    <FileVersion>1.4.0</FileVersion>
     <Product>Onyxstrap</Product>
     <Description>Onyxstrap Roblox launcher</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -64,6 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />

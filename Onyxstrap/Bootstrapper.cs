@@ -554,11 +554,43 @@ namespace Onyxstrap
             }
         }
 
+        private static void EnsureRobloxClosedForAccountSwitch()
+        {
+            foreach (string name in new[] { "RobloxPlayerBeta", "RobloxPlayer", "RobloxStudioBeta" })
+            {
+                var processes = Process.GetProcessesByName(name);
+                bool running = processes.Length > 0;
+                foreach (var process in processes) process.Dispose();
+                if (running) throw new InvalidOperationException("Close Roblox before launching a saved account.");
+            }
+        }
+
         private async Task StartRoblox()
         {
             const string LOG_IDENT = "Bootstrapper::StartRoblox";
 
             SetStatus(Strings.Bootstrapper_Status_Starting);
+
+            string? accountToken = null;
+            if (App.LaunchSettings.AccountFlag.Active)
+            {
+                try
+                {
+                    if (_launchMode != LaunchMode.Player || ShouldRunAsAdmin())
+                        throw new InvalidOperationException("Saved-account launch requires Roblox Player running without administrator mode.");
+                    if (!Guid.TryParse(App.LaunchSettings.AccountFlag.Data, out _))
+                        throw new InvalidOperationException("Select a saved account from Onyxstrap settings.");
+                    EnsureRobloxClosedForAccountSwitch();
+                    accountToken = await new AccountManager(Path.Combine(Paths.Base, "Accounts.json"))
+                        .GetVerifiedToken(App.LaunchSettings.AccountFlag.Data!);
+                    _launchCommandLine = await RobloxAuth.BuildAccountLaunchArgs(_launchCommandLine, accountToken);
+                }
+                catch (Exception ex)
+                {
+                    Frontend.ShowMessageBox(ex is InvalidOperationException ? ex.Message : "The saved account could not be prepared. Launch was cancelled.", System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+            }
 
             var startInfo = new ProcessStartInfo()
             {
@@ -604,11 +636,26 @@ namespace Onyxstrap
                 logCreatedEvent.Set();
             };
 
+            RobloxCookieStore.SessionChange? accountSession = null;
+            if (accountToken is not null)
+            {
+                try {
+                    EnsureRobloxClosedForAccountSwitch();
+                    accountSession = new RobloxCookieStore.SessionChange(Path.Combine(rbxDir, "LocalStorage", "RobloxCookies.dat"), accountToken);
+                }
+                catch (Exception) {
+                    Frontend.ShowMessageBox("Could not prepare the Roblox session. Close Roblox and sign in normally once. Unsupported session formats are left unchanged.", System.Windows.MessageBoxImage.Warning);
+                    logWatcher.Dispose(); logCreatedEvent.Dispose();
+                    return;
+                }
+            }
+
             // v2.2.0 - byfron will trip if we keep a process handle open for over a minute, so we're doing this now
             try
             {
                 using var process = Process.Start(startInfo)!;
                 _appPid = process.Id;
+                accountSession?.Commit();
             }
             catch (Win32Exception ex) when (ex.NativeErrorCode == 1223)
             {
@@ -618,8 +665,13 @@ namespace Onyxstrap
             catch (Exception)
             {
                 // attempt a reinstall on next launch
-                File.Delete(AppData.ExecutablePath);
+                if (accountToken is null) File.Delete(AppData.ExecutablePath);
                 throw;
+            }
+
+            finally
+            {
+                accountSession?.Dispose();
             }
 
             App.Logger.WriteLine(LOG_IDENT, $"Started Roblox (PID {_appPid}), waiting for log file");

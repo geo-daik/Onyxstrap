@@ -1,0 +1,28 @@
+<ui:UiPage x:Class="Onyxstrap.UI.Elements.Settings.Pages.AccountsPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" Title="Accounts" Scrollable="True" Loaded="OnLoaded">
+ <StackPanel Margin="0,0,16,16">
+  <TextBlock Text="Your Roblox accounts" FontSize="24" FontWeight="SemiBold"/>
+  <TextBlock Text="Save an account, then launch it when Roblox is closed." Margin="0,8,0,16" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+  <Border Padding="14" CornerRadius="10" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" Margin="0,0,0,16">
+   <StackPanel>
+    <TextBlock Text="Experimental — known issues" FontWeight="SemiBold" Margin="0,0,0,6"/>
+    <TextBlock Text="The account switcher still has problems and may not sign in or switch accounts correctly. Check the account shown in Roblox after launching. If switching fails, open Roblox and sign in normally." TextWrapping="Wrap"/>
+   </StackPanel>
+  </Border>
+  <ui:Button Content="Add account" Click="Add_Click" Appearance="Primary" HorizontalAlignment="Left" Margin="0,0,0,16"/>
+  <TextBlock x:Name="Status" TextWrapping="Wrap" Margin="0,0,0,12"/>
+  <ListBox x:Name="Accounts" MinHeight="100" MaxHeight="270" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch">
+   <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="8">
+    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"/>
+    <TextBlock Text="{Binding UserId, StringFormat=Roblox user ID: {0}}" Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+   </StackPanel></DataTemplate></ListBox.ItemTemplate>
+  </ListBox>
+  <WrapPanel Margin="0,16,0,0">
+   <ui:Button Content="Launch selected" Click="Launch_Click" Appearance="Primary" Margin="0,0,8,8"/>
+   <ui:Button Content="Sign in again" Click="Reauthenticate_Click" Margin="0,0,8,8"/>
+   <ui:Button Content="Remove" Click="Remove_Click" Margin="0,0,8,8"/>
+  </WrapPanel>
+ </StackPanel>
+</ui:UiPage>

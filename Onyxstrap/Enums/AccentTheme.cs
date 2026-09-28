@@ -21,6 +21,17 @@ namespace Onyxstrap.Enums
         [EnumName(StaticName = "Magma")]
         Magma,
         [EnumName(StaticName = "Lime")]
-        Lime
+        Lime,
+        Lavender,
+        Mint,
+        Peach,
+        Gold,
+        Teal,
+        Indigo,
+        Coral,
+        Sky,
+        Fuchsia,
+        Ice,
+        Custom
     }
 }
