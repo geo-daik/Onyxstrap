@@ -554,15 +554,21 @@ namespace Onyxstrap
             }
         }
 
-        private static void EnsureRobloxClosedForAccountSwitch()
+        private static bool IsRobloxRunning()
         {
             foreach (string name in new[] { "RobloxPlayerBeta", "RobloxPlayer", "RobloxStudioBeta" })
             {
                 var processes = Process.GetProcessesByName(name);
                 bool running = processes.Length > 0;
                 foreach (var process in processes) process.Dispose();
-                if (running) throw new InvalidOperationException("Close Roblox before launching a saved account.");
+                if (running) return true;
             }
+            return false;
+        }
+
+        private static void EnsureRobloxClosedForAccountSwitch()
+        {
+            if (IsRobloxRunning()) throw new InvalidOperationException("Close Roblox before launching a saved account.");
         }
 
         private async Task StartRoblox()
@@ -636,12 +642,29 @@ namespace Onyxstrap
                 logCreatedEvent.Set();
             };
 
+            string cookieStorePath = Path.Combine(rbxDir, "LocalStorage", "RobloxCookies.dat");
+
+            if (accountToken is null && _launchMode == LaunchMode.Player && !IsRobloxRunning())
+            {
+                // a previous saved-account launch swapped the session; give the user their own account back
+                try
+                {
+                    if (RobloxCookieStore.RestoreOriginal(cookieStorePath))
+                        App.Logger.WriteLine(LOG_IDENT, "Restored the original Roblox session after a saved-account launch");
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "Could not restore the original Roblox session");
+                    App.Logger.WriteException(LOG_IDENT, ex);
+                }
+            }
+
             RobloxCookieStore.SessionChange? accountSession = null;
             if (accountToken is not null)
             {
                 try {
                     EnsureRobloxClosedForAccountSwitch();
-                    accountSession = new RobloxCookieStore.SessionChange(Path.Combine(rbxDir, "LocalStorage", "RobloxCookies.dat"), accountToken);
+                    accountSession = new RobloxCookieStore.SessionChange(cookieStorePath, accountToken);
                 }
                 catch (Exception) {
                     Frontend.ShowMessageBox("Could not prepare the Roblox session. Close Roblox and sign in normally once. Unsupported session formats are left unchanged.", System.Windows.MessageBoxImage.Warning);
@@ -671,7 +694,16 @@ namespace Onyxstrap
 
             finally
             {
-                accountSession?.Dispose();
+                // never let session cleanup hide the real launch error
+                try
+                {
+                    accountSession?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "Could not finish the saved-account session change");
+                    App.Logger.WriteException(LOG_IDENT, ex);
+                }
             }
 
             App.Logger.WriteLine(LOG_IDENT, $"Started Roblox (PID {_appPid}), waiting for log file");

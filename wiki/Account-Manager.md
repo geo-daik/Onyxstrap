@@ -12,7 +12,8 @@
 - A failed process launch restores the prior encrypted session. Concurrent switches are blocked; external changes preserve the recovery backup instead of being overwritten.
 - Switching requires Roblox to be closed and disallows administrator-mode launches.
 - Login navigation checks HTTPS hostnames, blocks popups/downloads, disables password/autofill saving, and uses a separate temporary profile for each login. Closing cancels requests, stops polling, clears cookies, disposes the browser, and retries profile deletion. Windows locks can still prevent profile deletion; this is logged.
-- Legacy per-account FastFlags are retained as data but are not automatically applied. Normal launch uses the current Roblox session.
+- Legacy per-account FastFlags are retained as data but are not automatically applied.
+- A saved-account launch keeps your own encrypted Roblox session aside. The next normal launch (with Roblox closed) puts it back, so you return to your own account.
 
 
 ## Compatibility

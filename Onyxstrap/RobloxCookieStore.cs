@@ -81,9 +81,44 @@ namespace Onyxstrap
                         if (File.ReadAllBytes(_path).SequenceEqual(_installed)) File.Move(_backup, _path, true);
                         else throw new IOException("Session changed externally; the original encrypted backup was preserved.");
                     }
-                    else if (File.Exists(_backup)) File.Delete(_backup);
+                    else if (File.Exists(_backup))
+                    {
+                        // Keep the user's own session so the next normal launch can put it back.
+                        // When switching between saved accounts, the oldest backup is the real original.
+                        string original = OriginalPath(_path);
+                        if (File.Exists(original)) File.Delete(_backup);
+                        else File.Move(_backup, original);
+                    }
                 }
-                finally { _lock.Dispose(); }
+                finally
+                {
+                    _lock.Dispose();
+                    try { File.Delete(_path + ".onyx-lock"); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+                }
+            }
+        }
+
+        internal static string OriginalPath(string path) => path + ".onyx-original";
+
+        /// <summary>
+        /// Puts back the session that was active before a saved-account launch.
+        /// Returns false when there is nothing to restore.
+        /// </summary>
+        internal static bool RestoreOriginal(string path)
+        {
+            string original = OriginalPath(path);
+            if (!File.Exists(original)) return false;
+            var gate = new FileStream(path + ".onyx-lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            try
+            {
+                if (!File.Exists(original)) return false;
+                File.Move(original, path, true);
+                return true;
+            }
+            finally
+            {
+                gate.Dispose();
+                try { File.Delete(path + ".onyx-lock"); } catch (IOException) { } catch (UnauthorizedAccessException) { }
             }
         }
     }
