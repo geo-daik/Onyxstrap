@@ -37,9 +37,15 @@ try {
  using (var change = new RobloxCookieStore.SessionChange(file, "fake-new")) change.Commit();
  Check(Plain(File.ReadAllBytes(file)).EndsWith("fake-new"), "successful launch commits session");
  Check(Directory.GetFiles(dir, "*.onyx-backup-*").Length == 0, "completed transaction removes backup");
+ Check(File.ReadAllBytes(file + ".onyx-original").SequenceEqual(original), "commit keeps the user's original session");
+ using (var change = new RobloxCookieStore.SessionChange(file, "fake-second")) change.Commit();
+ Check(File.ReadAllBytes(file + ".onyx-original").SequenceEqual(original), "switching saved accounts keeps the first original");
+ Check(!File.Exists(file + ".onyx-lock"), "completed transaction removes lock file");
  var conflict = new RobloxCookieStore.SessionChange(file, "fake-next"); File.WriteAllBytes(file, Fixture());
  Throws(conflict.Dispose, "rollback never overwrites externally changed session");
  Check(Directory.GetFiles(dir, "*.onyx-backup-*").Length == 1, "external change preserves recovery backup");
+ Check(RobloxCookieStore.RestoreOriginal(file) && File.ReadAllBytes(file).SequenceEqual(original) && !File.Exists(file + ".onyx-original"), "normal launch restores original session");
+ Check(!RobloxCookieStore.RestoreOriginal(file), "restore is a no-op without a saved original");
  var store = new AccountManager(Path.Combine(dir, "Accounts.json"));
  store.SaveSession(123, "FakeAccount", "fake-session");
  var account = store.Read().Accounts.Single();
